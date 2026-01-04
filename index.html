@@ -140,179 +140,146 @@
 
         // --- BANCO DE DADOS MASSIVO (+3000 ITENS SIMULADOS NA ESTRUTURA) ---
         const RAW_DATA = {
-          "Comida": [
-            "Arroz", "Feijão", "Feijoada", "Pizza", "Hambúrguer", "Batata Frita", "Sushi", "Sashimi", "Temaki", "Yakisoba",
-            "Churrasco", "Picanha", "Linguiça", "Farofa", "Vinagrete", "Salpicão", "Maionese", "Lasanha", "Nhoque", "Ravioli",
-            "Macarrão", "Espaguete", "Panqueca", "Omelete", "Ovo Frito", "Misto Quente", "Bauru", "Hot Dog", "Pastel", "Coxinha",
-            "Kibe", "Esfiha", "Empada", "Pão de Queijo", "Croquete", "Risoles", "Acarajé", "Vatapá", "Moqueca", "Bobó de Camarão",
-            "Baião de Dois", "Carne de Sol", "Tapioca", "Cuscuz", "Pamonha", "Canjica", "Pipoca", "Bolo de Cenoura", "Bolo de Chocolate",
-            "Brigadeiro", "Beijinho", "Pudim", "Mousse", "Gelatina", "Açaí", "Sorvete", "Picolé", "Paçoca", "Pé de Moleque", "Churros",
-            "Sonho", "Donut", "Waffle", "Crepe", "Fondue", "Petit Gateau", "Brownie", "Cookie", "Torta de Limão", "Cheesecake", "Tiramisu",
-            "Café", "Leite", "Suco de Laranja", "Refrigerante", "Água de Coco", "Caldo de Cana", "Cerveja", "Vinho", "Caipirinha",
-            "Banana", "Maçã", "Laranja", "Limão", "Uva", "Melancia", "Melão", "Abacaxi", "Morango", "Pera", "Manga", "Mamão", "Abacate",
-            "Coco", "Maracujá", "Kiwi", "Cereja", "Pêssego", "Ameixa", "Goiaba", "Caju", "Jabuticaba", "Caqui", "Figo", "Amora", "Framboesa",
-            "Tomate", "Batata", "Cenoura", "Alface", "Cebola", "Alho", "Brócolis", "Couve", "Espinafre", "Pepino", "Abóbora", "Chuchu",
-            "Beterraba", "Pimentão", "Milho", "Ervilha", "Palmito", "Azeitona", "Cogumelo", "Bacon", "Presunto", "Queijo", "Requeijão",
-            "Iogurte", "Manteiga", "Mel", "Açúcar", "Sal", "Pimenta", "Azeite", "Vinagre", "Ketchup", "Mostarda", "Ovo de Páscoa", "Panetone",
-            "Rabanada", "Peru de Natal", "Chester", "Lentilha", "Bacalhau", "Salmão", "Atum", "Sardinha", "Camarão", "Lagosta", "Lula", "Polvo"
-          ],
-          "Animais": [
-            "Cachorro", "Gato", "Hamster", "Coelho", "Cavalo", "Vaca", "Boi", "Porco", "Ovelha", "Cabra", "Galinha", "Galo", "Pato", "Peru",
-            "Leão", "Tigre", "Onça", "Leopardo", "Lobo", "Raposa", "Urso", "Urso Polar", "Panda", "Elefante", "Girafa", "Hipopótamo",
-            "Rinoceronte", "Zebra", "Búfalo", "Canguru", "Coala", "Macaco", "Gorila", "Chimpanzé", "Mico", "Preguiça", "Tamanduá", "Tatu",
-            "Capivara", "Anta", "Esquilo", "Castor", "Lontra", "Foca", "Leão Marinho", "Baleia", "Golfinho", "Orca", "Tubarão", "Peixe",
-            "Salmão", "Tartaruga", "Jabuti", "Jacaré", "Crocodilo", "Cobra", "Sapo", "Rã", "Águia", "Gavião", "Coruja", "Urubu", "Papagaio",
-            "Arara", "Tucano", "Pinguim", "Avestruz", "Pombo", "Beija-Flor", "Morcego", "Abelha", "Formiga", "Borboleta", "Mosca", "Mosquito",
-            "Aranha", "Escorpião", "Barata", "Besouro", "Grilo", "Gafanhoto", "Minhoca", "Caracol", "Estrela do Mar", "Água Viva", "Polvo",
-            "Lula", "Camarão", "Caranguejo", "Siri", "Lagosta", "Dinossauro", "T-Rex", "Mamute", "Unicórnio", "Dragão", "Fênix", "Pégaso",
-            "Lobisomem", "Pônei", "Lhama", "Alpaca", "Camelo", "Dromedário", "Hiena", "Suricato", "Lêmure", "Ornitorrinco", "Equidna"
-          ],
-          "Objetos": [
-            "Celular", "Computador", "Notebook", "Tablet", "Televisão", "Controle Remoto", "Videogame", "Fone de Ouvido", "Carregador",
-            "Câmera", "Relógio", "Smartwatch", "Impressora", "Roteador", "Pen Drive", "Teclado", "Mouse", "Caixa de Som", "Microfone",
-            "Geladeira", "Fogão", "Micro-ondas", "Forno", "Liquidificador", "Batedeira", "Torradeira", "Cafeteira", "Air Fryer",
-            "Máquina de Lavar", "Ferro de Passar", "Aspirador de Pó", "Ventilador", "Ar Condicionado", "Lâmpada", "Abajur", "Lanterna",
-            "Cama", "Colchão", "Travesseiro", "Cobertor", "Lençol", "Sofá", "Poltrona", "Cadeira", "Mesa", "Guarda-Roupa", "Armário",
-            "Gaveta", "Espelho", "Tapete", "Cortina", "Vaso", "Quadro", "Porta", "Janela", "Chave", "Cadeado", "Vassoura", "Rodo",
-            "Balde", "Pano", "Esponja", "Sabão", "Detergente", "Shampoo", "Sabonete", "Escova de Dente", "Pasta de Dente", "Fio Dental",
-            "Pente", "Escova de Cabelo", "Secador", "Chapinha", "Barbeador", "Cortador de Unha", "Alicate", "Esmalte", "Batom", "Perfume",
-            "Desodorante", "Papel Higiênico", "Toalha", "Prato", "Copo", "Xícara", "Caneca", "Taça", "Garfo", "Faca", "Colher", "Concha",
-            "Panela", "Frigideira", "Forma", "Tigela", "Pote", "Garrafa", "Saca-Rolhas", "Abridor", "Tesoura", "Estilete", "Régua",
-            "Caneta", "Lápis", "Borracha", "Apontador", "Caderno", "Livro", "Agenda", "Pasta", "Grampeador", "Clips", "Fita Adesiva",
-            "Cola", "Mochila", "Bolsa", "Carteira", "Mala", "Guarda-Chuva", "Óculos", "Óculos de Sol", "Anel", "Brinco", "Colar", "Pulseira"
-          ],
-          "Famosos": [
-            "Silvio Santos", "Faustão", "Gugu", "Xuxa", "Ana Maria Braga", "Luciano Huck", "Eliana", "Celso Portiolli", "Ratinho", "Datena",
-            "William Bonner", "Fátima Bernardes", "Pedro Bial", "Tiago Leifert", "Tadeu Schmidt", "Marcos Mion", "Sabrina Sato", "Ivete Sangalo",
-            "Claudia Leitte", "Anitta", "Ludmilla", "Iza", "Luísa Sonza", "Gloria Groove", "Pabllo Vittar", "Marília Mendonça", "Gusttavo Lima",
-            "Luan Santana", "Jorge e Mateus", "Henrique e Juliano", "Zé Neto e Cristiano", "Maiara e Maraisa", "Simone e Simaria", "Roberto Carlos",
-            "Caetano Veloso", "Gilberto Gil", "Chico Buarque", "Djavan", "Tim Maia", "Cazuza", "Renato Russo", "Rita Lee", "Elis Regina",
-            "Neymar", "Pelé", "Ronaldo Fenômeno", "Ronaldinho Gaúcho", "Romário", "Zico", "Kaká", "Cafu", "Roberto Carlos (Jogador)",
-            "Messi", "Cristiano Ronaldo", "Mbappé", "Maradona", "Beckham", "Marta", "Formiga", "Gisele Bündchen", "Alessandra Ambrósio",
-            "Adriana Lima", "Juliette", "Gil do Vigor", "Boca Rosa", "Virgínia", "Zé Felipe", "Whindersson Nunes", "Felipe Neto",
-            "Casimiro", "Alanzoka", "Gaules", "Luva de Pedreiro", "Maísa", "Larissa Manoela", "Bruna Marquezine", "Marina Ruy Barbosa",
-            "Paolla Oliveira", "Juliana Paes", "Grazi Massafera", "Tatá Werneck", "Paulo Gustavo", "Fábio Porchat", "Danilo Gentili",
-            "Michael Jackson", "Madonna", "Beyoncé", "Rihanna", "Lady Gaga", "Katy Perry", "Taylor Swift", "Ariana Grande", "Adele",
-            "Shakira", "Jennifer Lopez", "Britney Spears", "Justin Bieber", "Bruno Mars", "Ed Sheeran", "The Weeknd", "Drake", "Eminem",
-            "Snoop Dogg", "Kanye West", "Jay-Z", "Elvis Presley", "Freddie Mercury", "John Lennon", "Paul McCartney", "David Bowie",
-            "Kurt Cobain", "Axl Rose", "Mick Jagger", "Elton John", "Brad Pitt", "Angelina Jolie", "Leonardo DiCaprio", "Tom Cruise",
-            "Will Smith", "Johnny Depp", "Robert Downey Jr", "Chris Evans", "Chris Hemsworth", "Scarlett Johansson", "Jennifer Aniston",
-            "Julia Roberts", "Meryl Streep", "Sandra Bullock", "Dwayne Johnson (The Rock)", "Vin Diesel", "Keanu Reeves", "Nicolas Cage"
-          ],
-          "Personagens": [
-            "Mickey Mouse", "Minnie", "Pato Donald", "Pateta", "Pluto", "Cinderela", "Branca de Neve", "Ariel", "Bela", "Jasmine",
-            "Elsa", "Anna", "Olaf", "Moana", "Mulan", "Pocahontas", "Tiana", "Rapunzel", "Merida", "Sininho", "Peter Pan", "Capitão Gancho",
-            "Simba", "Timão", "Pumba", "Mufasa", "Scar", "Woody", "Buzz Lightyear", "Jessie", "Sr. Cabeça de Batata", "Relâmpago McQueen",
-            "Mate", "Nemo", "Dory", "Shrek", "Fiona", "Burro", "Gato de Botas", "Gru", "Minions", "Bob Esponja", "Patrick", "Lula Molusco",
-            "Seu Sirigueijo", "Sandy Bochechas", "Plankton", "Goku", "Vegeta", "Gohan", "Piccolo", "Freeza", "Cell", "Majin Boo", "Naruto",
-            "Sasuke", "Sakura", "Kakashi", "Luffy", "Zoro", "Sanji", "Nami", "Chopper", "Pikachu", "Ash Ketchum", "Charizard", "Bulbasaur",
-            "Squirtle", "Meowth", "Jigglypuff", "Snorlax", "Mewtwo", "Yugi Muto", "Kaiba", "Seiya", "Shiryu", "Hyoga", "Shun", "Ikki",
-            "Saori", "Sailor Moon", "Sakura Card Captors", "Harry Potter", "Hermione", "Rony Weasley", "Dumbledore", "Snape", "Voldemort",
-            "Dobby", "Hagrid", "Frodo", "Gandalf", "Aragorn", "Legolas", "Gimli", "Gollum", "Sauron", "Luke Skywalker", "Darth Vader",
-            "Princesa Leia", "Han Solo", "Chewbacca", "Yoda", "Obi-Wan Kenobi", "Kylo Ren", "Rey", "Mandaloriano", "Baby Yoda",
-            "Homem de Ferro", "Capitão América", "Thor", "Hulk", "Viúva Negra", "Gavião Arqueiro", "Homem-Aranha", "Doutor Estranho",
-            "Pantera Negra", "Capitã Marvel", "Thanos", "Loki", "Wolverine", "Deadpool", "Professor Xavier", "Magneto", "Tempestade",
-            "Batman", "Superman", "Mulher Maravilha", "Flash", "Aquaman", "Ciborgue", "Lanterna Verde", "Coringa", "Arlequina",
-            "Charada", "Pinguim", "Mulher Gato", "Lex Luthor", "Mario", "Luigi", "Princesa Peach", "Bowser", "Yoshi", "Toad", "Sonic",
-            "Tails", "Knuckles", "Eggman", "Link", "Zelda", "Kratos", "Master Chief", "Lara Croft", "Pac-Man", "Ryu", "Ken", "Chun-Li",
-            "Scorpion", "Sub-Zero", "Chaves", "Kiko", "Chiquinha", "Seu Madruga", "Dona Florinda", "Professor Girafales", "Bruxa do 71",
-            "Sr. Barriga", "Nhonho", "Chapolin Colorado", "Mônica", "Cebolinha", "Cascão", "Magali", "Chico Bento", "Franjinha", "Bidu"
-          ],
-          "Filmes & Séries": [
-            "Vingadores", "Liga da Justiça", "Star Wars", "Harry Potter", "Senhor dos Anéis", "O Hobbit", "Piratas do Caribe", "Velozes e Furiosos",
-            "Missão Impossível", "007", "Matrix", "Exterminador do Futuro", "De Volta para o Futuro", "Indiana Jones", "Jurassic Park",
-            "Tubarão", "O Poderoso Chefão", "Pulp Fiction", "Clube da Luta", "Forrest Gump", "Titanic", "Avatar", "O Rei Leão", "Toy Story",
-            "Shrek", "Meu Malvado Favorito", "Frozen", "Divertida Mente", "Procurando Nemo", "Os Incríveis", "Carros", "Monstros S.A.",
-            "Up: Altas Aventuras", "Wall-E", "Ratatouille", "A Era do Gelo", "Madagascar", "Kung Fu Panda", "Como Treinar o Seu Dragão",
-            "Minions", "Homem-Aranha", "Batman", "Superman", "X-Men", "Friends", "How I Met Your Mother", "The Big Bang Theory", "Two and a Half Men",
-            "Um Maluco no Pedaço", "Todo Mundo Odeia o Chris", "Eu, a Patroa e as Crianças", "Chaves", "Chapolin", "A Grande Família",
-            "Tapas e Beijos", "Sai de Baixo", "Os Normais", "Vai que Cola", "Game of Thrones", "Breaking Bad", "Stranger Things", "The Walking Dead",
-            "Grey's Anatomy", "House", "Supernatural", "Lost", "Prison Break", "La Casa de Papel", "Round 6", "Dark", "Black Mirror", "The Crown",
-            "Bridgerton", "Wandinha", "The Witcher", "The Last of Us", "O Gambito da Rainha", "Peaky Blinders", "Vikings", "Suits", "Lucifer",
-            "Brooklyn Nine-Nine", "The Office", "Modern Family", "Simpsons", "Uma Família da Pesada", "South Park", "Rick and Morty", "Futurama"
-          ],
-          "Profissões": [
-            "Médico", "Enfermeiro", "Dentista", "Veterinário", "Psicólogo", "Fisioterapeuta", "Nutricionista", "Farmacêutico", "Biomédico",
-            "Professor", "Pedagogo", "Diretor de Escola", "Advogado", "Juiz", "Promotor", "Delegado", "Policial", "Bombeiro", "Guarda de Trânsito",
-            "Segurança", "Detetive", "Engenheiro Civil", "Engenheiro Elétrico", "Engenheiro Mecânico", "Arquiteto", "Designer de Interiores",
-            "Pedreiro", "Pintor", "Eletricista", "Encanador", "Marceneiro", "Serralheiro", "Mecânico", "Borracheiro", "Motorista", "Taxista",
-            "Caminhoneiro", "Motoboy", "Piloto de Avião", "Comissário de Bordo", "Astronauta", "Marinheiro", "Pescador", "Agricultor", "Fazendeiro",
-            "Jardineiro", "Gari", "Lixeiro", "Empregada Doméstica", "Babá", "Cozinheiro", "Chef de Cozinha", "Garçom", "Barman", "Padeiro",
-            "Confeiteiro", "Açougueiro", "Feirante", "Vendedor", "Caixa de Supermercado", "Atendente", "Recepcionista", "Secretária",
-            "Telefonista", "Cabeleireiro", "Barbeiro", "Manicure", "Maquiador", "Esteticista", "Massagista", "Tatuador", "Costureira",
-            "Estilista", "Modelo", "Fotógrafo", "Jornalista", "Repórter", "Apresentador", "Locutor", "Ator", "Cantor", "Músico", "DJ",
-            "Dançarino", "Palhaço", "Mágico", "Malabarista", "Escritor", "Poeta", "Pintor (Artista)", "Escultor", "Programador", "Web Designer",
-            "Analista de Sistemas", "Cientista", "Biólogo", "Químico", "Físico", "Astrônomo", "Historiador", "Geógrafo", "Matemático",
-            "Economista", "Contador", "Administrador", "Empresário", "Corretor de Imóveis", "Bancário", "Político", "Padre", "Pastor"
-          ],
-          "Lugares": [
-            "Brasil", "Estados Unidos", "Argentina", "Portugal", "Espanha", "França", "Itália", "Alemanha", "Inglaterra", "Japão", "China",
-            "Coreia do Sul", "Índia", "Rússia", "Austrália", "Canadá", "México", "Egito", "África do Sul", "Grécia", "Turquia", "Israel",
-            "Arábia Saudita", "Dubai", "Paris", "Londres", "Nova York", "Los Angeles", "Las Vegas", "Miami", "Orlando", "Disney", "Roma",
-            "Veneza", "Tóquio", "Pequim", "Sydney", "Rio de Janeiro", "São Paulo", "Salvador", "Recife", "Fortaleza", "Brasília",
-            "Belo Horizonte", "Curitiba", "Porto Alegre", "Florianópolis", "Manaus", "Belém", "Fernando de Noronha", "Cristo Redentor",
-            "Pão de Açúcar", "Maracanã", "Copacabana", "Ipanema", "Avenida Paulista", "Parque Ibirapuera", "Cataratas do Iguaçu", "Amazônia",
-            "Pantanal", "Lençóis Maranhenses", "Pelourinho", "Torre Eiffel", "Estátua da Liberdade", "Coliseu", "Torre de Pisa",
-            "Muralha da China", "Pirâmides do Egito", "Taj Mahal", "Machu Picchu", "Grand Canyon", "Monte Everest", "Antártida", "Lua", "Marte",
-            "Casa", "Escola", "Faculdade", "Trabalho", "Escritório", "Hospital", "Farmácia", "Supermercado", "Padaria", "Açougue", "Feira",
-            "Shopping", "Loja", "Banco", "Correio", "Delegacia", "Igreja", "Cemitério", "Cinema", "Teatro", "Museu", "Biblioteca", "Estádio",
-            "Ginásio", "Academia", "Parque", "Praça", "Praia", "Piscina", "Clube", "Zoológico", "Circo", "Parque de Diversões", "Restaurante",
-            "Lanchonete", "Bar", "Balada", "Hotel", "Aeroporto", "Rodoviária", "Estação de Trem", "Metrô", "Ponto de Ônibus", "Posto de Gasolina"
-          ],
-          "Corpo Humano": [
-            "Cabeça", "Cabelo", "Testa", "Sobrancelha", "Olho", "Cílios", "Orelha", "Nariz", "Bochecha", "Boca", "Lábio", "Dente", "Língua",
-            "Queixo", "Barba", "Bigode", "Pescoço", "Garganta", "Ombro", "Braço", "Cotovelo", "Antebraço", "Pulso", "Mão", "Dedo", "Unha",
-            "Polegar", "Peito", "Seio", "Mamilo", "Barriga", "Umbigo", "Costas", "Coluna", "Cintura", "Quadril", "Bumbum", "Perna", "Coxa",
-            "Joelho", "Canela", "Panturrilha", "Tornozelo", "Calcanhar", "Pé", "Dedo do Pé", "Pele", "Osso", "Músculo", "Sangue", "Veia",
-            "Artéria", "Coração", "Pulmão", "Estômago", "Fígado", "Rim", "Intestino", "Bexiga", "Cérebro", "Crânio", "Costela", "Esqueleto"
-          ],
-          "Natureza & Espaço": [
-            "Sol", "Lua", "Estrela", "Planeta", "Terra", "Marte", "Júpiter", "Saturno", "Galáxia", "Universo", "Buraco Negro", "Cometa",
-            "Meteoro", "Asteroide", "Foguete", "Astronauta", "Alien", "Ovni", "Céu", "Nuvem", "Chuva", "Raio", "Trovão", "Tempestade",
-            "Neve", "Granizo", "Vento", "Furacão", "Tornado", "Terremoto", "Tsunami", "Vulcão", "Arco-Íris", "Aurora Boreal", "Nascer do Sol",
-            "Pôr do Sol", "Dia", "Noite", "Eclipse", "Mar", "Oceano", "Onda", "Praia", "Areia", "Ilha", "Rio", "Lago", "Lagoa", "Cachoeira",
-            "Montanha", "Morro", "Vale", "Deserto", "Floresta", "Selva", "Árvore", "Flor", "Rosa", "Girassol", "Margarida", "Orquídea",
-            "Cacto", "Grama", "Folha", "Pedra", "Rocha", "Terra", "Lama", "Fogo", "Fumaça", "Cinza", "Gelo", "Água", "Ar"
-          ],
-          "Veículos": [
-            "Carro", "Moto", "Caminhão", "Ônibus", "Bicicleta", "Skate", "Patins", "Patinete", "Avião", "Helicóptero", "Barco", "Navio",
-            "Lancha", "Submarino", "Trem", "Metrô", "Bonde", "Táxi", "Uber", "Ambulância", "Viatura de Polícia", "Carro de Bombeiro",
-            "Trator", "Escavadeira", "Guindaste", "Empilhadeira", "Foguete", "Disco Voador", "Balão", "Dirigível", "Paraquedas", "Asa Delta",
-            "Jet Ski", "Canoa", "Jangada", "Veleiro", "Cruzeiro", "Fusca", "Brasília", "Kombi", "Ferrari", "Lamborghini", "Porsche", "Camaro",
-            "Mustang", "Jeep", "Picape", "Van", "Limusine", "Carruagem", "Charrete", "Triciclo", "Quadriciclo", "Carrinho de Mão", "Carrinho de Bebê"
-          ],
-          "Marcas & Apps": [
-            "Coca-Cola", "Pepsi", "McDonald's", "Burger King", "Subway", "Starbucks", "Nestlé", "Garoto", "Lacta", "Kinder", "Nutella",
-            "Oreo", "Doritos", "Ruffles", "Cheetos", "Pringles", "M&M's", "Snickers", "KitKat", "Havaianas", "Nike", "Adidas", "Puma",
-            "Vans", "Converse", "Gucci", "Louis Vuitton", "Chanel", "Zara", "Renner", "Riachuelo", "C&A", "Apple", "iPhone", "Samsung",
-            "Xiaomi", "Motorola", "Nokia", "Sony", "LG", "Microsoft", "Windows", "Google", "Facebook", "Instagram", "WhatsApp", "TikTok",
-            "Twitter", "X", "YouTube", "Netflix", "Amazon", "Prime Video", "Disney+", "HBO Max", "Spotify", "Uber", "iFood", "Rappi",
-            "Mercado Livre", "Shopee", "AliExpress", "Shein", "Nubank", "Inter", "Itaú", "Bradesco", "Caixa", "Banco do Brasil", "Santander",
-            "Ferrari", "Lamborghini", "Porsche", "BMW", "Mercedes", "Audi", "Volkswagen", "Ford", "Chevrolet", "Fiat", "Toyota", "Honda",
-            "Hyundai", "Jeep", "Tesla", "PlayStation", "Xbox", "Nintendo", "Lego", "Barbie", "Hot Wheels", "Monopoly", "Uno", "Globo", "SBT"
-          ],
-          "História & Mitos": [
-            "Jesus", "Deus", "Diabo", "Anjo", "Demônio", "Papai Noel", "Coelhinho da Páscoa", "Fada do Dente", "Saci Pererê", "Curupira",
-            "Mula Sem Cabeça", "Boto Cor-de-Rosa", "Iara", "Boitatá", "Cuca", "Lobisomem", "Vampiro", "Drácula", "Frankenstein", "Múmia",
-            "Zumbi", "Fantasma", "Bruxa", "Fada", "Sereia", "Duende", "Gnomo", "Ogro", "Gigante", "Ciclope", "Minotauro", "Medusa", "Pégaso",
-            "Unicórnio", "Dragão", "Fênix", "Kraken", "Pé Grande", "Monstro do Lago Ness", "ET", "Alien", "Zeus", "Poseidon", "Hades", "Apolo",
-            "Ares", "Afrodite", "Atena", "Hércules", "Thor", "Odin", "Loki", "Anúbis", "Rá", "Buda", "Gandhi", "Einstein", "Newton",
-            "Da Vinci", "Picasso", "Van Gogh", "Mozart", "Beethoven", "Shakespeare", "Colombo", "Cabral", "Dom Pedro I", "Dom Pedro II",
-            "Tiradentes", "Zumbi dos Palmares", "Lampião", "Maria Bonita", "Getúlio Vargas", "Juscelino Kubitschek", "Lula", "Bolsonaro",
-            "Obama", "Trump", "Rainha Elizabeth", "Princesa Diana", "Hitler", "Napoleão", "César", "Cleópatra", "Rei Arthur", "Robin Hood"
-          ],
-          "Esportes & Lazer": [
-            "Futebol", "Vôlei", "Basquete", "Handebol", "Tênis", "Ping Pong", "Badminton", "Golfe", "Beisebol", "Futebol Americano", "Rugby",
-            "Hóquei", "Críquete", "Polo Aquático", "Natação", "Surfe", "Skate", "Patinação", "Ciclismo", "Corrida", "Atletismo", "Salto em Distância",
-            "Salto em Altura", "Ginástica", "Judô", "Karatê", "Jiu-Jitsu", "Taekwondo", "Boxe", "MMA", "Capoeira", "Luta Livre", "Esgrima",
-            "Arco e Flecha", "Tiro ao Alvo", "Hipismo", "Fórmula 1", "Kart", "Motocross", "Rali", "Paraquedismo", "Asa Delta", "Bungee Jumping",
-            "Escalada", "Trilha", "Acampamento", "Pesca", "Sinuca", "Boliche", "Dardo", "Xadrez", "Dama", "Dominó", "Baralho", "Poker", "Truco",
-            "Uno", "Videogame", "Palavras Cruzadas", "Quebra-Cabeça", "Dança", "Balé", "Samba", "Forró", "Funk", "Rock", "Pop", "Sertanejo",
-            "Pagode", "Música Clássica", "Violão", "Guitarra", "Baixo", "Bateria", "Teclado", "Piano", "Violino", "Saxofone", "Flauta", "Trompete",
-            "Gaita", "Acordeon", "Pandeiro", "Tambor", "Microfone", "Bola", "Chuteira", "Raquete", "Rede", "Gol", "Cesta", "Piscina", "Tatame"
-          ]
-        };
-
+  "Comida": [
+    "Arroz", "Feijão", "Feijoada", "Pizza", "Hambúrguer", "Batata Frita", "Sushi", "Sashimi", "Temaki", "Yakisoba",
+    "Churrasco", "Picanha", "Linguiça", "Farofa", "Vinagrete", "Salpicão", "Maionese", "Lasanha", "Nhoque", "Ravioli",
+    "Macarrão", "Espaguete", "Panqueca", "Omelete", "Ovo Frito", "Misto Quente", "Bauru", "Hot Dog", "Pastel", "Coxinha",
+    "Kibe", "Esfiha", "Empada", "Pão de Queijo", "Croquete", "Risoles", "Acarajé", "Vatapá", "Moqueca", "Bobó de Camarão",
+    "Baião de Dois", "Carne de Sol", "Tapioca", "Cuscuz", "Pamonha", "Canjica", "Pipoca", "Bolo de Cenoura", "Bolo de Chocolate",
+    "Brigadeiro", "Beijinho", "Pudim", "Mousse", "Gelatina", "Açaí", "Sorvete", "Picolé", "Paçoca", "Pé de Moleque", "Churros",
+    "Sonho", "Donut", "Waffle", "Crepe", "Fondue", "Petit Gateau", "Brownie", "Cookie", "Torta de Limão", "Cheesecake", "Tiramisu",
+    "Café", "Leite", "Suco de Laranja", "Refrigerante", "Água de Coco", "Caldo de Cana", "Cerveja", "Vinho", "Caipirinha",
+    "Banana", "Maçã", "Laranja", "Limão", "Uva", "Melancia", "Melão", "Abacaxi", "Morango", "Pera", "Manga", "Mamão", "Abacate",
+    "Coco", "Maracujá", "Kiwi", "Cereja", "Pêssego", "Ameixa", "Goiaba", "Caju", "Jabuticaba", "Caqui", "Figo", "Amora", "Framboesa",
+    "Tomate", "Batata", "Cenoura", "Alface", "Cebola", "Alho", "Brócolis", "Couve", "Espinafre", "Pepino", "Abóbora", "Chuchu",
+    "Beterraba", "Pimentão", "Milho", "Ervilha", "Palmito", "Azeitona", "Cogumelo", "Bacon", "Presunto", "Queijo", "Requeijão",
+    "Iogurte", "Manteiga", "Mel", "Açúcar", "Sal", "Pimenta", "Azeite", "Vinagre", "Ketchup", "Mostarda", "Ovo de Páscoa", "Panetone",
+    "Rabanada", "Peru de Natal", "Chester", "Lentilha", "Bacalhau", "Salmão", "Atum", "Sardinha", "Camarão", "Lagosta", "Lula", "Polvo",
+    "Strogonoff", "Pão na Chapa", "Mousse de Maracujá", "Quindim", "Doce de Leite", "Goiabada"
+  ],
+  "Animais": [
+    "Cachorro", "Gato", "Hamster", "Coelho", "Cavalo", "Vaca", "Boi", "Porco", "Ovelha", "Cabra",
+    "Galinha", "Galo", "Pato", "Peru", "Leão", "Tigre", "Onça", "Leopardo", "Lobo", "Raposa",
+    "Urso", "Urso Polar", "Panda", "Elefante", "Girafa", "Hipopótamo", "Rinoceronte", "Zebra", "Búfalo", "Canguru",
+    "Coala", "Macaco", "Gorila", "Chimpanzé", "Mico", "Preguiça", "Tamanduá", "Tatu", "Capivara", "Anta",
+    "Esquilo", "Castor", "Lontra", "Foca", "Leão Marinho", "Baleia", "Golfinho", "Orca", "Tubarão", "Peixe",
+    "Salmão", "Tartaruga", "Jabuti", "Jacaré", "Crocodilo", "Cobra", "Sapo", "Rã", "Águia", "Gavião",
+    "Coruja", "Urubu", "Papagaio", "Arara", "Tucano", "Pinguim", "Avestruz", "Pombo", "Beija-Flor", "Morcego",
+    "Abelha", "Formiga", "Borboleta", "Mosca", "Mosquito", "Aranha", "Escorpião", "Barata", "Besouro", "Grilo",
+    "Gafanhoto", "Minhoca", "Caracol", "Estrela do Mar", "Água Viva", "Polvo", "Lula", "Camarão", "Caranguejo", "Siri",
+    "Lagosta", "Dinossauro", "T-Rex", "Mamute", "Unicórnio", "Dragão", "Fênix", "Pégaso", "Lobisomem", "Pônei",
+    "Lhama", "Alpaca", "Camelo", "Dromedário", "Hiena", "Suricato", "Lêmure", "Ornitorrinco", "Equidna"
+  ],
+  "Veículos": [
+    "Bicicleta", "Skate", "Patins", "Patinete", "Monociclo", "Triciclo", "Carrinho de Mão", "Canoa", "Caiaque", "Pedalinho",
+    "Carro", "Moto", "Caminhão", "Ônibus", "Trator", "Ferrari", "Fusca", "Kombi", "Limusine", "Jipe",
+    "Picape", "Avião", "Helicóptero", "Foguete", "Balão", "Dirigível", "Asa Delta", "Paraquedas", "Navio", "Barco",
+    "Lancha", "Submarino", "Iate", "Veleiro", "Jet Ski", "Jangada", "Trem", "Metrô", "Bonde", "Carruagem",
+    "Charrete", "Trenó"
+  ],
+  "Utensílios & Casa": [
+    "Geladeira", "Fogão", "Micro-ondas", "Forno", "Liquidificador", "Batedeira", "Torradeira", "Cafeteira", "Air Fryer", "Máquina de Lavar",
+    "Ferro de Passar", "Aspirador de Pó", "Ventilador", "Ar Condicionado", "Lâmpada", "Abajur", "Lanterna", "Vassoura", "Rodo", "Balde",
+    "Esponja", "Prato", "Copo", "Xícara", "Caneca", "Taça", "Garfo", "Faca", "Colher", "Concha",
+    "Panela", "Frigideira", "Forma", "Tigela", "Pote", "Garrafa", "Saca-Rolhas", "Abridor", "Tesoura", "Escumadeira",
+    "Peneira", "Ralador", "Tábua de Carne", "Filtro de Água", "Sanduicheira", "Moedor", "Garrafa Térmica", "Porta Copos", "Saleiro", "Paliteiro"
+  ],
+  "Objetos Pessoais": [
+    "Celular", "Computador", "Notebook", "Tablet", "Televisão", "Controle Remoto", "Videogame", "Fone de Ouvido", "Carregador", "Câmera",
+    "Relógio", "Smartwatch", "Impressora", "Roteador", "Pen Drive", "Teclado", "Mouse", "Caixa de Som", "Microfone", "Cama",
+    "Colchão", "Travesseiro", "Cobertor", "Lençol", "Sofá", "Poltrona", "Cadeira", "Mesa", "Guarda-Roupa", "Armário",
+    "Gaveta", "Espelho", "Tapete", "Cortina", "Vaso", "Quadro", "Porta", "Janela", "Chave", "Cadeado",
+    "Shampoo", "Sabonete", "Escova de Dente", "Pasta de Dente", "Fio Dental", "Pente", "Escova de Cabelo", "Secador", "Chapinha", "Barbeador",
+    "Cortador de Unha", "Alicate", "Esmalte", "Batom", "Perfume", "Desodorante", "Papel Higiênico", "Toalha", "Mochila", "Bolsa",
+    "Carteira", "Mala", "Guarda-Chuva", "Óculos", "Óculos de Sol", "Anel", "Brinco", "Colar", "Pulseira"
+  ],
+  "Famosos": [
+    "Silvio Santos", "Faustão", "Gugu", "Xuxa", "Ana Maria Braga", "Luciano Huck", "Eliana", "Celso Portiolli", "Ratinho", "Datena",
+    "William Bonner", "Fátima Bernardes", "Pedro Bial", "Tiago Leifert", "Tadeu Schmidt", "Marcos Mion", "Sabrina Sato", "Ivete Sangalo", "Claudia Leitte", "Anitta",
+    "Ludmilla", "Iza", "Luísa Sonza", "Gloria Groove", "Pabllo Vittar", "Marília Mendonça", "Gusttavo Lima", "Luan Santana", "Jorge e Mateus", "Henrique e Juliano",
+    "Zé Neto e Cristiano", "Maiara e Maraisa", "Simone e Simaria", "Roberto Carlos", "Caetano Veloso", "Gilberto Gil", "Chico Buarque", "Djavan", "Tim Maia", "Cazuza",
+    "Renato Russo", "Rita Lee", "Elis Regina", "Neymar", "Pelé", "Ronaldo Fenômeno", "Ronaldinho Gaúcho", "Romário", "Zico", "Kaká",
+    "Cafu", "Messi", "Cristiano Ronaldo", "Mbappé", "Maradona", "Beckham", "Marta", "Formiga", "Gisele Bündchen", "Alessandra Ambrósio",
+    "Adriana Lima", "Juliette", "Gil do Vigor", "Boca Rosa", "Virgínia", "Zé Felipe", "Whindersson Nunes", "Felipe Neto", "Casimiro", "Alanzoka",
+    "Gaules", "Luva de Pedreiro", "Maísa", "Larissa Manoela", "Bruna Marquezine", "Marina Ruy Barbosa", "Paolla Oliveira", "Juliana Paes", "Grazi Massafera", "Tatá Werneck",
+    "Paulo Gustavo", "Fábio Porchat", "Danilo Gentili"
+  ],
+  "Personagens": [
+    "Mickey Mouse", "Minnie", "Pato Donald", "Pateta", "Pluto", "Cinderela", "Branca de Neve", "Ariel", "Bela", "Jasmine",
+    "Elsa", "Anna", "Olaf", "Moana", "Mulan", "Pocahontas", "Tiana", "Rapunzel", "Merida", "Sininho",
+    "Peter Pan", "Capitão Gancho", "Simba", "Timão", "Pumba", "Mufasa", "Scar", "Woody", "Buzz Lightyear", "Jessie",
+    "Relâmpago McQueen", "Mate", "Nemo", "Dory", "Shrek", "Fiona", "Burro", "Gato de Botas", "Gru", "Minions",
+    "Bob Esponja", "Patrick", "Lula Molusco", "Seu Sirigueijo", "Sandy Bochechas", "Plankton", "Goku", "Vegeta", "Gohan", "Piccolo",
+    "Freeza", "Cell", "Majin Boo", "Naruto", "Pikachu", "Ash Ketchum", "Charizard", "Bulbasaur", "Squirtle", "Meowth",
+    "Jigglypuff", "Snorlax", "Mewtwo", "Yugi Muto", "Kaiba", "Seiya", "Shiryu", "Hyoga", "Shun", "Ikki",
+    "Harry Potter", "Hermione", "Rony Weasley", "Dumbledore", "Snape", "Voldemort", "Dobby", "Hagrid", "Frodo", "Gandalf",
+    "Aragorn", "Legolas", "Gimli", "Gollum", "Sauron", "Luke Skywalker", "Darth Vader", "Princesa Leia", "Han Solo", "Chewbacca",
+    "Yoda", "Obi-Wan Kenobi", "Homem de Ferro", "Capitão América", "Thor", "Hulk", "Viúva Negra", "Homem-Aranha", "Batman", "Superman",
+    "Mulher Maravilha", "Flash", "Aquaman", "Coringa", "Arlequina", "Mario", "Luigi", "Princesa Peach", "Bowser", "Yoshi",
+    "Toad", "Sonic", "Tails", "Kratos", "Lara Croft", "Pac-Man", "Chaves", "Kiko", "Chiquinha", "Seu Madruga",
+    "Dona Florinda", "Professor Girafales", "Mônica", "Cebolinha", "Cascão", "Magali"
+  ],
+  "Filmes & Séries": [
+    "Vingadores", "Liga da Justiça", "Star Wars", "Harry Potter", "Senhor dos Anéis", "Piratas do Caribe", "Velozes e Furiosos", "Missão Impossível", "007", "Matrix",
+    "Exterminador do Futuro", "De Volta para o Futuro", "Indiana Jones", "Jurassic Park", "Tubarão", "O Poderoso Chefão", "Pulp Fiction", "Titanic", "Avatar", "O Rei Leão",
+    "Toy Story", "Shrek", "Frozen", "Divertida Mente", "Procurando Nemo", "Friends", "How I Met Your Mother", "The Big Bang Theory", "Two and a Half Men", "Um Maluco no Pedaço",
+    "Todo Mundo Odeia o Chris", "Eu, a Patroa e as Crianças", "Chaves", "A Grande Família", "Game of Thrones", "Breaking Bad", "Stranger Things", "The Walking Dead", "Grey's Anatomy", "House",
+    "Supernatural", "Lost", "La Casa de Papel", "Round 6", "Dark", "The Office", "Simpsons"
+  ],
+  "Profissões": [
+    "Médico", "Enfermeiro", "Dentista", "Veterinário", "Psicólogo", "Fisioterapeuta", "Nutricionista", "Farmacêutico", "Biomédico", "Professor",
+    "Advogado", "Juiz", "Promotor", "Delegado", "Policial", "Bombeiro", "Guarda de Trânsito", "Segurança", "Engenheiro Civil", "Arquiteto",
+    "Pedreiro", "Pintor", "Eletricista", "Encanador", "Marceneiro", "Mecânico", "Motorista", "Taxista", "Caminhoneiro", "Motoboy",
+    "Piloto de Avião", "Comissário de Bordo", "Astronauta", "Marinheiro", "Pescador", "Agricultor", "Jardineiro", "Gari", "Babá", "Cozinheiro",
+    "Chef de Cozinha", "Garçom", "Barman", "Padeiro", "Confeiteiro", "Vendedor", "Caixa de Supermercado", "Atendente", "Recepcionista", "Secretária",
+    "Cabeleireiro", "Barbeiro", "Manicure", "Maquiador", "Tatuador", "Costureira", "Fotógrafo", "Jornalista", "Apresentador", "Ator",
+    "Cantor", "Músico", "DJ", "Dançarino", "Escritor", "Programador", "Cientista", "Biólogo", "Economista", "Contador",
+    "Empresário", "Político", "Padre", "Pastor"
+  ],
+  "Lugares": [
+    "Brasil", "Estados Unidos", "Argentina", "Portugal", "Espanha", "França", "Itália", "Alemanha", "Inglaterra", "Japão",
+    "China", "Rússia", "Austrália", "Canadá", "México", "Egito", "Grécia", "Paris", "Londres", "Nova York",
+    "Disney", "Roma", "Tóquio", "Rio de Janeiro", "São Paulo", "Salvador", "Recife", "Fortaleza", "Brasília", "Belo Horizonte",
+    "Curitiba", "Porto Alegre", "Cristo Redentor", "Pão de Açúcar", "Maracanã", "Copacabana", "Avenida Paulista", "Cataratas do Iguaçu", "Amazônia", "Torre Eiffel",
+    "Estátua da Liberdade", "Coliseu", "Muralha da China", "Pirâmides do Egito", "Taj Mahal", "Machu Picchu", "Lua", "Marte", "Casa", "Escola",
+    "Faculdade", "Trabalho", "Escritório", "Hospital", "Farmácia", "Supermercado", "Padaria", "Açougue", "Shopping", "Banco",
+    "Igreja", "Cemitério", "Cinema", "Teatro", "Museu", "Estádio", "Academia", "Parque", "Praça", "Praia",
+    "Piscina", "Zoológico", "Circo", "Restaurante", "Hotel", "Aeroporto"
+  ],
+  "Corpo Humano": [
+    "Cabeça", "Cabelo", "Olho", "Orelha", "Nariz", "Boca", "Dente", "Língua", "Pescoço", "Ombro",
+    "Braço", "Cotovelo", "Mão", "Dedo", "Unha", "Peito", "Barriga", "Umbigo", "Costas", "Coluna",
+    "Cintura", "Quadril", "Bumbum", "Perna", "Coxa", "Joelho", "Canela", "Tornozelo", "Pé", "Pele",
+    "Osso", "Músculo", "Sangue", "Coração", "Pulmão", "Estômago", "Fígado", "Rim", "Intestino", "Cérebro",
+    "Esqueleto"
+  ],
+  "Natureza & Espaço": [
+    "Sol", "Lua", "Estrela", "Planeta", "Terra", "Marte", "Júpiter", "Galáxia", "Universo", "Buraco Negro",
+    "Cometa", "Céu", "Nuvem", "Chuva", "Raio", "Tempestade", "Neve", "Vento", "Furacão", "Terremoto",
+    "Tsunami", "Vulcão", "Arco-Íris", "Mar", "Oceano", "Onda", "Praia", "Areia", "Ilha", "Rio",
+    "Lago", "Cachoeira", "Montanha", "Deserto", "Floresta", "Árvore", "Flor", "Rosa", "Girassol", "Grama",
+    "Folha", "Pedra", "Fogo", "Fumaça", "Gelo", "Água", "Ar"
+  ],
+  "Marcas & Apps": [
+    "Coca-Cola", "Pepsi", "McDonald's", "Burger King", "Subway", "Starbucks", "Nestlé", "Garoto", "Lacta", "Nutella",
+    "Oreo", "Nike", "Adidas", "Havaianas", "Gucci", "Zara", "Apple", "iPhone", "Samsung", "Xiaomi",
+    "Microsoft", "Windows", "Google", "Facebook", "Instagram", "WhatsApp", "TikTok", "Twitter", "YouTube", "Netflix",
+    "Amazon", "Spotify", "Uber", "iFood", "Mercado Livre", "Shopee", "Nubank", "Itaú", "Ferrari", "PlayStation",
+    "Xbox", "Nintendo", "Lego", "Barbie", "Globo"
+  ],
+  "História & Mitos": [
+    "Jesus", "Deus", "Anjo", "Papai Noel", "Coelhinho da Páscoa", "Fada do Dente", "Saci Pererê", "Curupira", "Mula Sem Cabeça", "Boto Cor-de-Rosa",
+    "Iara", "Lobisomem", "Vampiro", "Zumbi", "Fantasma", "Bruxa", "Fada", "Sereia", "Dragão", "Fênix",
+    "Unicórnio", "Zeus", "Poseidon", "Thor", "Buda", "Gandhi", "Einstein", "Da Vinci", "Napoleão", "Cleópatra"
+  ],
+  "Esportes & Lazer": [
+    "Futebol", "Vôlei", "Basquete", "Handebol", "Tênis", "Ping Pong", "Natação", "Surfe", "Skate", "Ciclismo",
+    "Corrida", "Atletismo", "Ginástica", "Judô", "Karatê", "Jiu-Jitsu", "Boxe", "MMA", "Capoeira", "Fórmula 1",
+    "Trilha", "Acampamento", "Pesca", "Sinuca", "Boliche", "Xadrez", "Dama", "Dominó", "Baralho", "Poker",
+    "Truco", "Uno", "Videogame", "Dança", "Samba", "Forró", "Funk", "Rock", "Pop", "Sertanejo",
+    "Violão", "Guitarra", "Bateria", "Piano", "Bola"
+  ]
+};
         // Processa RAW_DATA para lista plana
         const FULL_DATABASE = Object.entries(RAW_DATA).flatMap(([category, items]) => 
           items.map(name => ({ name, category }))
@@ -517,7 +484,7 @@
                 
                 {gameState === 'playing' && (
                   <div className="flex-shrink-0 h-[15%] w-full flex justify-between items-center px-8 sm:px-12 pt-4">
-                     <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4">
                         <button onClick={exitGame} className="p-3 bg-red-100 rounded-full text-red-500 border-2 border-red-200 shadow-sm active:scale-95 transition-transform" title="Sair do Jogo">
                            <LogOut size={22} />
                         </button>
@@ -528,18 +495,18 @@
                             <span className="retro-font text-xl text-yellow-700 animate-pop">{globalScore}</span>
                           </div>
                         </div>
-                     </div>
-                     <div className="flex flex-col items-end">
+                      </div>
+                      <div className="flex flex-col items-end">
                         <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Tempo</span>
                         <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border-2 shadow-sm font-bold text-xl font-mono ${timeLeft <= 10 ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'bg-white border-gray-200 text-gray-600'}`}>
                            {formatTime(timeLeft)}
                         </div>
-                     </div>
+                      </div>
                   </div>
                 )}
 
                 <div className="flex-1 w-full flex items-center justify-center p-4 px-8 sm:px-16 relative">
-                   
+                    
                    {gameState === 'setup' && (
                      <div className="w-full max-w-md bg-white/70 backdrop-blur-md rounded-3xl border-4 border-[#FF9EAA] p-6 shadow-xl flex flex-col items-center gap-4 animate-pop relative z-10">
                         <div className="text-center">
@@ -551,8 +518,8 @@
                              <div className="grid grid-cols-4 gap-2">
                                 {[60, 180, 300].map(sec => (
                                   <button key={sec} onClick={() => setSelectedTime(sec)} className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === sec ? 'border-teal-400 bg-teal-50 text-teal-600 shadow-md transform scale-105' : 'border-transparent bg-gray-50 text-gray-400'}`}>
-                                    <span className="text-lg font-bold">{sec / 60}</span>
-                                    <span className="text-[9px] font-bold">MIN</span>
+                                     <span className="text-lg font-bold">{sec / 60}</span>
+                                     <span className="text-[9px] font-bold">MIN</span>
                                   </button>
                                 ))}
                                 <button onClick={() => setSelectedTime('custom')} className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === 'custom' ? 'border-teal-400 bg-teal-50 text-teal-600' : 'border-transparent bg-gray-50 text-gray-400'}`}>
@@ -577,7 +544,7 @@
                                 <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl border-2 border-teal-200 shadow-xl max-h-[200px] overflow-y-auto custom-scrollbar z-50 animate-pop">
                                    {uniqueCategories.map(cat => (
                                       <button key={cat} onClick={() => { setSelectedCategory(cat); setIsCategoryMenuOpen(false); }} className={`w-full py-3 px-4 text-center font-bold text-sm border-b border-gray-50 last:border-0 hover:bg-teal-50 transition-colors ${selectedCategory === cat ? 'text-teal-600 bg-teal-50' : 'text-gray-600'}`}>
-                                         {cat}
+                                          {cat}
                                       </button>
                                    ))}
                                 </div>
@@ -644,7 +611,15 @@
                    {gameState === 'finished' && (
                      <div className="w-full max-w-md bg-white rounded-3xl border-4 border-gray-200 p-6 shadow-2xl flex flex-col items-center animate-pop relative">
                         <div className="absolute -top-5 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg uppercase tracking-widest animate-pulse text-sm">Tempo Esgotado!</div>
-                        <div className="mt-6 text-center w-full">
+                        
+                        {/* --- EXIBIÇÃO DA ÚLTIMA PALAVRA --- */}
+                        <div className="mt-6 mb-4 text-center w-full bg-gray-50 rounded-2xl p-4 border-2 border-dashed border-gray-300">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Última Palavra na Tela</p>
+                            <p className="text-xs font-bold text-teal-600 uppercase mb-1">{currentCard?.category}</p>
+                            <h3 className="retro-font text-3xl text-gray-700 leading-tight">{currentCard?.name}</h3>
+                        </div>
+
+                        <div className="text-center w-full">
                            <h2 className="text-gray-400 font-bold text-sm uppercase mb-4">Resultado desta rodada</h2>
                            <div className="flex justify-center gap-6 mb-6">
                               <div className="flex flex-col items-center bg-green-50 p-4 rounded-2xl w-28">
@@ -685,5 +660,3 @@
     </script>
 </body>
 </html>
-
-
