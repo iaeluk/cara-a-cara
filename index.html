@@ -129,9 +129,9 @@
             padding-bottom: 2vh;
         }
 
-        /* O Card em si - LARGURA AJUSTADA PARA 70% */
+        /* O Card em si - LARGURA EM 70% */
         #card {
-            width: 70%; /* Antes era 85% */
+            width: 70%;
             height: 100%;
             max-height: 55vh;
             display: flex;
@@ -213,8 +213,10 @@
     </div>
 
     <script>
-        // --- SCREEN WAKE LOCK ---
+        // --- SCREEN WAKE LOCK & FULLSCREEN ---
         let wakeLock = null;
+        
+        // 1. Manter a tela ligada
         const requestWakeLock = async () => {
             try {
                 if ('wakeLock' in navigator) {
@@ -223,12 +225,163 @@
                 }
             } catch (err) { console.error(err); }
         };
+
+        // 2. Colocar em Tela Cheia (Estilo Vídeo)
+        const enterFullscreen = () => {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => console.log(err));
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                }
+            }
+        };
+
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock();
         });
 
-        // --- BANCO DE DADOS (Mantido igual) ---
+        // --- BANCO DE DADOS EXPANDIDO ---
         const database = [
+            // === FRUTAS ===
+            { name: "Banana", category: "Fruta" },
+            { name: "Maçã", category: "Fruta" },
+            { name: "Uva", category: "Fruta" },
+            { name: "Melancia", category: "Fruta" },
+            { name: "Abacaxi", category: "Fruta" },
+            { name: "Morango", category: "Fruta" },
+            { name: "Limão", category: "Fruta" },
+            { name: "Laranja", category: "Fruta" },
+            { name: "Pera", category: "Fruta" },
+            { name: "Manga", category: "Fruta" },
+            { name: "Coco", category: "Fruta" },
+            { name: "Abacate", category: "Fruta" },
+            { name: "Cereja", category: "Fruta" },
+            { name: "Maracujá", category: "Fruta" },
+            { name: "Kiwi", category: "Fruta" },
+
+            // === VERDURAS & LEGUMES ===
+            { name: "Cenoura", category: "Legume" },
+            { name: "Batata", category: "Legume" },
+            { name: "Alface", category: "Verdura" },
+            { name: "Tomate", category: "Legume" },
+            { name: "Cebola", category: "Legume" },
+            { name: "Brócolis", category: "Verdura" },
+            { name: "Milho", category: "Legume" },
+            { name: "Abóbora", category: "Legume" },
+            { name: "Pepino", category: "Legume" },
+            { name: "Alho", category: "Tempero" },
+            { name: "Pimentão", category: "Legume" },
+
+            // === ANIMAIS ===
+            { name: "Cachorro", category: "Animal" },
+            { name: "Gato", category: "Animal" },
+            { name: "Elefante", category: "Animal" },
+            { name: "Leão", category: "Animal" },
+            { name: "Girafa", category: "Animal" },
+            { name: "Macaco", category: "Animal" },
+            { name: "Tubarão", category: "Animal" },
+            { name: "Baleia", category: "Animal" },
+            { name: "Papagaio", category: "Animal" },
+            { name: "Vaca", category: "Animal" },
+            { name: "Cavalo", category: "Animal" },
+            { name: "Pinguim", category: "Animal" },
+            { name: "Sapo", category: "Animal" },
+            { name: "Cobra", category: "Animal" },
+            { name: "Jacaré", category: "Animal" },
+            { name: "Zebra", category: "Animal" },
+            { name: "Urso Panda", category: "Animal" },
+            { name: "Coelho", category: "Animal" },
+            { name: "Tartaruga", category: "Animal" },
+            { name: "Borboleta", category: "Inseto" },
+            { name: "Abelha", category: "Inseto" },
+            { name: "Formiga", category: "Inseto" },
+
+            // === PROFISSÕES ===
+            { name: "Médico", category: "Profissão" },
+            { name: "Bombeiro", category: "Profissão" },
+            { name: "Professor", category: "Profissão" },
+            { name: "Policial", category: "Profissão" },
+            { name: "Astronauta", category: "Profissão" },
+            { name: "Chef de Cozinha", category: "Profissão" },
+            { name: "Palhaço", category: "Profissão" },
+            { name: "Bailarina", category: "Profissão" },
+            { name: "Cantor", category: "Profissão" },
+            { name: "Motorista", category: "Profissão" },
+            { name: "Dentista", category: "Profissão" },
+            { name: "Pintor", category: "Profissão" },
+            { name: "Mágico", category: "Profissão" },
+
+            // === VEÍCULOS ===
+            { name: "Carro", category: "Veículo" },
+            { name: "Moto", category: "Veículo" },
+            { name: "Bicicleta", category: "Veículo" },
+            { name: "Avião", category: "Veículo" },
+            { name: "Ônibus", category: "Veículo" },
+            { name: "Trem", category: "Veículo" },
+            { name: "Barco", category: "Veículo" },
+            { name: "Caminhão", category: "Veículo" },
+            { name: "Helicóptero", category: "Veículo" },
+            { name: "Skate", category: "Veículo" },
+            { name: "Patins", category: "Veículo" },
+            { name: "Foguete", category: "Veículo" },
+
+            // === COMIDAS & DOCES ===
+            { name: "Pizza", category: "Comida" },
+            { name: "Hambúrguer", category: "Comida" },
+            { name: "Batata Frita", category: "Comida" },
+            { name: "Sorvete", category: "Doce" },
+            { name: "Chocolate", category: "Doce" },
+            { name: "Pipoca", category: "Comida" },
+            { name: "Bolo", category: "Doce" },
+            { name: "Ovo Frito", category: "Comida" },
+            { name: "Macarrão", category: "Comida" },
+            { name: "Pão", category: "Comida" },
+            { name: "Queijo", category: "Comida" },
+            { name: "Brigadeiro", category: "Doce" },
+            { name: "Pudim", category: "Doce" },
+            { name: "Sopa", category: "Comida" },
+            { name: "Coxinha", category: "Salgado" },
+
+            // === NATUREZA & TEMPO ===
+            { name: "Sol", category: "Natureza" },
+            { name: "Lua", category: "Natureza" },
+            { name: "Chuva", category: "Natureza" },
+            { name: "Árvore", category: "Natureza" },
+            { name: "Flor", category: "Natureza" },
+            { name: "Nuvem", category: "Natureza" },
+            { name: "Mar", category: "Natureza" },
+            { name: "Fogo", category: "Natureza" },
+            { name: "Estrela", category: "Natureza" },
+            { name: "Arco-íris", category: "Natureza" },
+            { name: "Neve", category: "Natureza" },
+            { name: "Vulcão", category: "Natureza" },
+
+            // === CORPO HUMANO ===
+            { name: "Mão", category: "Corpo" },
+            { name: "Pé", category: "Corpo" },
+            { name: "Olho", category: "Corpo" },
+            { name: "Nariz", category: "Corpo" },
+            { name: "Boca", category: "Corpo" },
+            { name: "Orelha", category: "Corpo" },
+            { name: "Dente", category: "Corpo" },
+            { name: "Coração", category: "Corpo" },
+            { name: "Cabelo", category: "Corpo" },
+            { name: "Barriga", category: "Corpo" },
+
+            // === LUGARES ===
+            { name: "Praia", category: "Lugar" },
+            { name: "Cinema", category: "Lugar" },
+            { name: "Escola", category: "Lugar" },
+            { name: "Hospital", category: "Lugar" },
+            { name: "Shopping", category: "Lugar" },
+            { name: "Parque", category: "Lugar" },
+            { name: "Padaria", category: "Lugar" },
+            { name: "Casa", category: "Lugar" },
+            { name: "Fazenda", category: "Lugar" },
+            { name: "Circo", category: "Lugar" },
+
             // --- DESENHOS ANIMADOS & PERSONAGENS ---
             { name: "Pica-Pau", category: "Desenho" },
             { name: "Scooby-Doo", category: "Desenho" },
@@ -456,11 +609,20 @@
             { name: "Meia", category: "Roupa" },
             { name: "Camiseta", category: "Roupa" },
             { name: "Boné", category: "Acessório" },
-            { name: "Bola de Futebol", category: "Esporte" }
+            { name: "Bola de Futebol", category: "Esporte" },
+            { name: "Vassoura", category: "Objeto" },
+            { name: "Rodo", category: "Objeto" },
+            { name: "Balde", category: "Objeto" },
+            { name: "Pregador de Roupa", category: "Objeto" },
+            { name: "Fósforo", category: "Objeto" },
+            { name: "Vela", category: "Objeto" },
+            { name: "Agulha", category: "Costura" }
         ];
 
         function sortear() {
+            // Tenta ativar os recursos de tela (WakeLock e Fullscreen)
             if (!wakeLock) requestWakeLock();
+            enterFullscreen();
 
             const resultText = document.getElementById('result-text');
             const placeholderIcon = document.getElementById('placeholder-icon');
@@ -468,7 +630,7 @@
             const card = document.getElementById('card');
             const btnLabel = document.getElementById('btn-label');
 
-            // Muda o texto do botão para "REINICIAR" (ou "PRÓXIMO" conforme fluxo do jogo)
+            // Muda o texto do botão para "PRÓXIMO"
             if (btnLabel.textContent === "INICIAR") {
                 btnLabel.textContent = "PRÓXIMO";
             }
@@ -483,7 +645,7 @@
             resultText.textContent = selected.name;
             resultText.classList.add('animate-pop');
             
-            // Ajuste dinâmico de fonte (agora mais seguro com clamp no CSS como base)
+            // Ajuste dinâmico de fonte
             if (selected.name.length > 20) {
                 resultText.style.fontSize = '4.5vmin';
             } else if (selected.name.length > 12) {
