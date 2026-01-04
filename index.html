@@ -1,55 +1,413 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cara a Cara Retro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Shrikhand&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --color-coral: #FF9EAA;
-            --color-coral-dark: #FF7082;
-            --color-seafoam: #2DD4BF;
-            --color-seafoam-dark: #14B8A6;
-            --color-lemon: #FEF08A;
-            --color-lemon-dark: #FDE047;
-            --color-text: #374151;
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Trophy, Play, X, Check, Settings, Volume2, VolumeX, Trash2, RotateCcw, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
+
+// --- CONFIGURAÇÃO DE DADOS MASSIVA ---
+// Usamos listas simples para facilitar a manutenção de milhares de itens
+const RAW_DATA = {
+  "Comida": [
+    "Arroz", "Feijão", "Feijoada", "Pizza", "Hambúrguer", "Batata Frita", "Sushi", "Sashimi", "Temaki", "Yakisoba",
+    "Churrasco", "Picanha", "Linguiça", "Farofa", "Vinagrete", "Salpicão", "Maionese", "Lasanha", "Nhoque", "Ravioli",
+    "Macarrão", "Espaguete", "Panqueca", "Omelete", "Ovo Frito", "Misto Quente", "Bauru", "Hot Dog", "Pastel", "Coxinha",
+    "Kibe", "Esfiha", "Empada", "Pão de Queijo", "Croquete", "Risoles", "Acarajé", "Vatapá", "Moqueca", "Bobó de Camarão",
+    "Baião de Dois", "Carne de Sol", "Tapioca", "Cuscuz", "Pamonha", "Canjica", "Pipoca", "Bolo de Cenoura", "Bolo de Chocolate",
+    "Brigadeiro", "Beijinho", "Pudim", "Mousse", "Gelatina", "Açaí", "Sorvete", "Picolé", "Paçoca", "Pé de Moleque", "Churros",
+    "Sonho", "Donut", "Waffle", "Crepe", "Fondue", "Petit Gateau", "Brownie", "Cookie", "Torta de Limão", "Cheesecake", "Tiramisu",
+    "Café", "Leite", "Suco de Laranja", "Refrigerante", "Água de Coco", "Caldo de Cana", "Cerveja", "Vinho", "Caipirinha",
+    "Banana", "Maçã", "Laranja", "Limão", "Uva", "Melancia", "Melão", "Abacaxi", "Morango", "Pera", "Manga", "Mamão", "Abacate",
+    "Coco", "Maracujá", "Kiwi", "Cereja", "Pêssego", "Ameixa", "Goiaba", "Caju", "Jabuticaba", "Caqui", "Figo", "Amora", "Framboesa",
+    "Tomate", "Batata", "Cenoura", "Alface", "Cebola", "Alho", "Brócolis", "Couve", "Espinafre", "Pepino", "Abóbora", "Chuchu",
+    "Beterraba", "Pimentão", "Milho", "Ervilha", "Palmito", "Azeitona", "Cogumelo", "Bacon", "Presunto", "Queijo", "Requeijão",
+    "Iogurte", "Manteiga", "Mel", "Açúcar", "Sal", "Pimenta", "Azeite", "Vinagre", "Ketchup", "Mostarda", "Ovo de Páscoa", "Panetone",
+    "Rabanada", "Peru de Natal", "Chester", "Lentilha", "Bacalhau", "Salmão", "Atum", "Sardinha", "Camarão", "Lagosta", "Lula", "Polvo"
+  ],
+  "Animais": [
+    "Cachorro", "Gato", "Hamster", "Coelho", "Cavalo", "Vaca", "Boi", "Porco", "Ovelha", "Cabra", "Galinha", "Galo", "Pato", "Peru",
+    "Leão", "Tigre", "Onça", "Leopardo", "Lobo", "Raposa", "Urso", "Urso Polar", "Panda", "Elefante", "Girafa", "Hipopótamo",
+    "Rinoceronte", "Zebra", "Búfalo", "Canguru", "Coala", "Macaco", "Gorila", "Chimpanzé", "Mico", "Preguiça", "Tamanduá", "Tatu",
+    "Capivara", "Anta", "Esquilo", "Castor", "Lontra", "Foca", "Leão Marinho", "Baleia", "Golfinho", "Orca", "Tubarão", "Peixe",
+    "Salmão", "Tartaruga", "Jabuti", "Jacaré", "Crocodilo", "Cobra", "Sapo", "Rã", "Águia", "Gavião", "Coruja", "Urubu", "Papagaio",
+    "Arara", "Tucano", "Pinguim", "Avestruz", "Pombo", "Beija-Flor", "Morcego", "Abelha", "Formiga", "Borboleta", "Mosca", "Mosquito",
+    "Aranha", "Escorpião", "Barata", "Besouro", "Grilo", "Gafanhoto", "Minhoca", "Caracol", "Estrela do Mar", "Água Viva", "Polvo",
+    "Lula", "Camarão", "Caranguejo", "Siri", "Lagosta", "Dinossauro", "T-Rex", "Mamute", "Unicórnio", "Dragão", "Fênix", "Pégaso",
+    "Lobisomem", "Pônei", "Lhama", "Alpaca", "Camelo", "Dromedário", "Hiena", "Suricato", "Lêmure", "Ornitorrinco", "Equidna"
+  ],
+  "Objetos": [
+    "Celular", "Computador", "Notebook", "Tablet", "Televisão", "Controle Remoto", "Videogame", "Fone de Ouvido", "Carregador",
+    "Câmera", "Relógio", "Smartwatch", "Impressora", "Roteador", "Pen Drive", "Teclado", "Mouse", "Caixa de Som", "Microfone",
+    "Geladeira", "Fogão", "Micro-ondas", "Forno", "Liquidificador", "Batedeira", "Torradeira", "Cafeteira", "Air Fryer",
+    "Máquina de Lavar", "Ferro de Passar", "Aspirador de Pó", "Ventilador", "Ar Condicionado", "Lâmpada", "Abajur", "Lanterna",
+    "Cama", "Colchão", "Travesseiro", "Cobertor", "Lençol", "Sofá", "Poltrona", "Cadeira", "Mesa", "Guarda-Roupa", "Armário",
+    "Gaveta", "Espelho", "Tapete", "Cortina", "Vaso", "Quadro", "Porta", "Janela", "Chave", "Cadeado", "Vassoura", "Rodo",
+    "Balde", "Pano", "Esponja", "Sabão", "Detergente", "Shampoo", "Sabonete", "Escova de Dente", "Pasta de Dente", "Fio Dental",
+    "Pente", "Escova de Cabelo", "Secador", "Chapinha", "Barbeador", "Cortador de Unha", "Alicate", "Esmalte", "Batom", "Perfume",
+    "Desodorante", "Papel Higiênico", "Toalha", "Prato", "Copo", "Xícara", "Caneca", "Taça", "Garfo", "Faca", "Colher", "Concha",
+    "Panela", "Frigideira", "Forma", "Tigela", "Pote", "Garrafa", "Saca-Rolhas", "Abridor", "Tesoura", "Estilete", "Régua",
+    "Caneta", "Lápis", "Borracha", "Apontador", "Caderno", "Livro", "Agenda", "Pasta", "Grampeador", "Clips", "Fita Adesiva",
+    "Cola", "Mochila", "Bolsa", "Carteira", "Mala", "Guarda-Chuva", "Óculos", "Óculos de Sol", "Anel", "Brinco", "Colar", "Pulseira"
+  ],
+  "Famosos": [
+    "Silvio Santos", "Faustão", "Gugu", "Xuxa", "Ana Maria Braga", "Luciano Huck", "Eliana", "Celso Portiolli", "Ratinho", "Datena",
+    "William Bonner", "Fátima Bernardes", "Pedro Bial", "Tiago Leifert", "Tadeu Schmidt", "Marcos Mion", "Sabrina Sato", "Ivete Sangalo",
+    "Claudia Leitte", "Anitta", "Ludmilla", "Iza", "Luísa Sonza", "Gloria Groove", "Pabllo Vittar", "Marília Mendonça", "Gusttavo Lima",
+    "Luan Santana", "Jorge e Mateus", "Henrique e Juliano", "Zé Neto e Cristiano", "Maiara e Maraisa", "Simone e Simaria", "Roberto Carlos",
+    "Caetano Veloso", "Gilberto Gil", "Chico Buarque", "Djavan", "Tim Maia", "Cazuza", "Renato Russo", "Rita Lee", "Elis Regina",
+    "Neymar", "Pelé", "Ronaldo Fenômeno", "Ronaldinho Gaúcho", "Romário", "Zico", "Kaká", "Cafu", "Roberto Carlos (Jogador)",
+    "Messi", "Cristiano Ronaldo", "Mbappé", "Maradona", "Beckham", "Marta", "Formiga", "Gisele Bündchen", "Alessandra Ambrósio",
+    "Adriana Lima", "Juliette", "Gil do Vigor", "Boca Rosa", "Virgínia", "Zé Felipe", "Whindersson Nunes", "Felipe Neto",
+    "Casimiro", "Alanzoka", "Gaules", "Luva de Pedreiro", "Maísa", "Larissa Manoela", "Bruna Marquezine", "Marina Ruy Barbosa",
+    "Paolla Oliveira", "Juliana Paes", "Grazi Massafera", "Tatá Werneck", "Paulo Gustavo", "Fábio Porchat", "Danilo Gentili",
+    "Michael Jackson", "Madonna", "Beyoncé", "Rihanna", "Lady Gaga", "Katy Perry", "Taylor Swift", "Ariana Grande", "Adele",
+    "Shakira", "Jennifer Lopez", "Britney Spears", "Justin Bieber", "Bruno Mars", "Ed Sheeran", "The Weeknd", "Drake", "Eminem",
+    "Snoop Dogg", "Kanye West", "Jay-Z", "Elvis Presley", "Freddie Mercury", "John Lennon", "Paul McCartney", "David Bowie",
+    "Kurt Cobain", "Axl Rose", "Mick Jagger", "Elton John", "Brad Pitt", "Angelina Jolie", "Leonardo DiCaprio", "Tom Cruise",
+    "Will Smith", "Johnny Depp", "Robert Downey Jr", "Chris Evans", "Chris Hemsworth", "Scarlett Johansson", "Jennifer Aniston",
+    "Julia Roberts", "Meryl Streep", "Sandra Bullock", "Dwayne Johnson (The Rock)", "Vin Diesel", "Keanu Reeves", "Nicolas Cage"
+  ],
+  "Personagens": [
+    "Mickey Mouse", "Minnie", "Pato Donald", "Pateta", "Pluto", "Cinderela", "Branca de Neve", "Ariel", "Bela", "Jasmine",
+    "Elsa", "Anna", "Olaf", "Moana", "Mulan", "Pocahontas", "Tiana", "Rapunzel", "Merida", "Sininho", "Peter Pan", "Capitão Gancho",
+    "Simba", "Timão", "Pumba", "Mufasa", "Scar", "Woody", "Buzz Lightyear", "Jessie", "Sr. Cabeça de Batata", "Relâmpago McQueen",
+    "Mate", "Nemo", "Dory", "Shrek", "Fiona", "Burro", "Gato de Botas", "Gru", "Minions", "Bob Esponja", "Patrick", "Lula Molusco",
+    "Seu Sirigueijo", "Sandy Bochechas", "Plankton", "Goku", "Vegeta", "Gohan", "Piccolo", "Freeza", "Cell", "Majin Boo", "Naruto",
+    "Sasuke", "Sakura", "Kakashi", "Luffy", "Zoro", "Sanji", "Nami", "Chopper", "Pikachu", "Ash Ketchum", "Charizard", "Bulbasaur",
+    "Squirtle", "Meowth", "Jigglypuff", "Snorlax", "Mewtwo", "Yugi Muto", "Kaiba", "Seiya", "Shiryu", "Hyoga", "Shun", "Ikki",
+    "Saori", "Sailor Moon", "Sakura Card Captors", "Harry Potter", "Hermione", "Rony Weasley", "Dumbledore", "Snape", "Voldemort",
+    "Dobby", "Hagrid", "Frodo", "Gandalf", "Aragorn", "Legolas", "Gimli", "Gollum", "Sauron", "Luke Skywalker", "Darth Vader",
+    "Princesa Leia", "Han Solo", "Chewbacca", "Yoda", "Obi-Wan Kenobi", "Kylo Ren", "Rey", "Mandaloriano", "Baby Yoda",
+    "Homem de Ferro", "Capitão América", "Thor", "Hulk", "Viúva Negra", "Gavião Arqueiro", "Homem-Aranha", "Doutor Estranho",
+    "Pantera Negra", "Capitã Marvel", "Thanos", "Loki", "Wolverine", "Deadpool", "Professor Xavier", "Magneto", "Tempestade",
+    "Batman", "Superman", "Mulher Maravilha", "Flash", "Aquaman", "Ciborgue", "Lanterna Verde", "Coringa", "Arlequina",
+    "Charada", "Pinguim", "Mulher Gato", "Lex Luthor", "Mario", "Luigi", "Princesa Peach", "Bowser", "Yoshi", "Toad", "Sonic",
+    "Tails", "Knuckles", "Eggman", "Link", "Zelda", "Kratos", "Master Chief", "Lara Croft", "Pac-Man", "Ryu", "Ken", "Chun-Li",
+    "Scorpion", "Sub-Zero", "Chaves", "Kiko", "Chiquinha", "Seu Madruga", "Dona Florinda", "Professor Girafales", "Bruxa do 71",
+    "Sr. Barriga", "Nhonho", "Chapolin Colorado", "Mônica", "Cebolinha", "Cascão", "Magali", "Chico Bento", "Franjinha", "Bidu"
+  ],
+  "Filmes & Séries": [
+    "Vingadores", "Liga da Justiça", "Star Wars", "Harry Potter", "Senhor dos Anéis", "O Hobbit", "Piratas do Caribe", "Velozes e Furiosos",
+    "Missão Impossível", "007", "Matrix", "Exterminador do Futuro", "De Volta para o Futuro", "Indiana Jones", "Jurassic Park",
+    "Tubarão", "O Poderoso Chefão", "Pulp Fiction", "Clube da Luta", "Forrest Gump", "Titanic", "Avatar", "O Rei Leão", "Toy Story",
+    "Shrek", "Meu Malvado Favorito", "Frozen", "Divertida Mente", "Procurando Nemo", "Os Incríveis", "Carros", "Monstros S.A.",
+    "Up: Altas Aventuras", "Wall-E", "Ratatouille", "A Era do Gelo", "Madagascar", "Kung Fu Panda", "Como Treinar o Seu Dragão",
+    "Minions", "Homem-Aranha", "Batman", "Superman", "X-Men", "Friends", "How I Met Your Mother", "The Big Bang Theory", "Two and a Half Men",
+    "Um Maluco no Pedaço", "Todo Mundo Odeia o Chris", "Eu, a Patroa e as Crianças", "Chaves", "Chapolin", "A Grande Família",
+    "Tapas e Beijos", "Sai de Baixo", "Os Normais", "Vai que Cola", "Game of Thrones", "Breaking Bad", "Stranger Things", "The Walking Dead",
+    "Grey's Anatomy", "House", "Supernatural", "Lost", "Prison Break", "La Casa de Papel", "Round 6", "Dark", "Black Mirror", "The Crown",
+    "Bridgerton", "Wandinha", "The Witcher", "The Last of Us", "O Gambito da Rainha", "Peaky Blinders", "Vikings", "Suits", "Lucifer",
+    "Brooklyn Nine-Nine", "The Office", "Modern Family", "Simpsons", "Uma Família da Pesada", "South Park", "Rick and Morty", "Futurama"
+  ],
+  "Profissões": [
+    "Médico", "Enfermeiro", "Dentista", "Veterinário", "Psicólogo", "Fisioterapeuta", "Nutricionista", "Farmacêutico", "Biomédico",
+    "Professor", "Pedagogo", "Diretor de Escola", "Advogado", "Juiz", "Promotor", "Delegado", "Policial", "Bombeiro", "Guarda de Trânsito",
+    "Segurança", "Detetive", "Engenheiro Civil", "Engenheiro Elétrico", "Engenheiro Mecânico", "Arquiteto", "Designer de Interiores",
+    "Pedreiro", "Pintor", "Eletricista", "Encanador", "Marceneiro", "Serralheiro", "Mecânico", "Borracheiro", "Motorista", "Taxista",
+    "Caminhoneiro", "Motoboy", "Piloto de Avião", "Comissário de Bordo", "Astronauta", "Marinheiro", "Pescador", "Agricultor", "Fazendeiro",
+    "Jardineiro", "Gari", "Lixeiro", "Empregada Doméstica", "Babá", "Cozinheiro", "Chef de Cozinha", "Garçom", "Barman", "Padeiro",
+    "Confeiteiro", "Açougueiro", "Feirante", "Vendedor", "Caixa de Supermercado", "Atendente", "Recepcionista", "Secretária",
+    "Telefonista", "Cabeleireiro", "Barbeiro", "Manicure", "Maquiador", "Esteticista", "Massagista", "Tatuador", "Costureira",
+    "Estilista", "Modelo", "Fotógrafo", "Jornalista", "Repórter", "Apresentador", "Locutor", "Ator", "Cantor", "Músico", "DJ",
+    "Dançarino", "Palhaço", "Mágico", "Malabarista", "Escritor", "Poeta", "Pintor (Artista)", "Escultor", "Programador", "Web Designer",
+    "Analista de Sistemas", "Cientista", "Biólogo", "Químico", "Físico", "Astrônomo", "Historiador", "Geógrafo", "Matemático",
+    "Economista", "Contador", "Administrador", "Empresário", "Corretor de Imóveis", "Bancário", "Político", "Padre", "Pastor"
+  ],
+  "Lugares": [
+    "Brasil", "Estados Unidos", "Argentina", "Portugal", "Espanha", "França", "Itália", "Alemanha", "Inglaterra", "Japão", "China",
+    "Coreia do Sul", "Índia", "Rússia", "Austrália", "Canadá", "México", "Egito", "África do Sul", "Grécia", "Turquia", "Israel",
+    "Arábia Saudita", "Dubai", "Paris", "Londres", "Nova York", "Los Angeles", "Las Vegas", "Miami", "Orlando", "Disney", "Roma",
+    "Veneza", "Tóquio", "Pequim", "Sydney", "Rio de Janeiro", "São Paulo", "Salvador", "Recife", "Fortaleza", "Brasília",
+    "Belo Horizonte", "Curitiba", "Porto Alegre", "Florianópolis", "Manaus", "Belém", "Fernando de Noronha", "Cristo Redentor",
+    "Pão de Açúcar", "Maracanã", "Copacabana", "Ipanema", "Avenida Paulista", "Parque Ibirapuera", "Cataratas do Iguaçu", "Amazônia",
+    "Pantanal", "Lençóis Maranhenses", "Pelourinho", "Torre Eiffel", "Estátua da Liberdade", "Coliseu", "Torre de Pisa",
+    "Muralha da China", "Pirâmides do Egito", "Taj Mahal", "Machu Picchu", "Grand Canyon", "Monte Everest", "Antártida", "Lua", "Marte",
+    "Casa", "Escola", "Faculdade", "Trabalho", "Escritório", "Hospital", "Farmácia", "Supermercado", "Padaria", "Açougue", "Feira",
+    "Shopping", "Loja", "Banco", "Correio", "Delegacia", "Igreja", "Cemitério", "Cinema", "Teatro", "Museu", "Biblioteca", "Estádio",
+    "Ginásio", "Academia", "Parque", "Praça", "Praia", "Piscina", "Clube", "Zoológico", "Circo", "Parque de Diversões", "Restaurante",
+    "Lanchonete", "Bar", "Balada", "Hotel", "Aeroporto", "Rodoviária", "Estação de Trem", "Metrô", "Ponto de Ônibus", "Posto de Gasolina"
+  ],
+  "Corpo Humano": [
+    "Cabeça", "Cabelo", "Testa", "Sobrancelha", "Olho", "Cílios", "Orelha", "Nariz", "Bochecha", "Boca", "Lábio", "Dente", "Língua",
+    "Queixo", "Barba", "Bigode", "Pescoço", "Garganta", "Ombro", "Braço", "Cotovelo", "Antebraço", "Pulso", "Mão", "Dedo", "Unha",
+    "Polegar", "Peito", "Seio", "Mamilo", "Barriga", "Umbigo", "Costas", "Coluna", "Cintura", "Quadril", "Bumbum", "Perna", "Coxa",
+    "Joelho", "Canela", "Panturrilha", "Tornozelo", "Calcanhar", "Pé", "Dedo do Pé", "Pele", "Osso", "Músculo", "Sangue", "Veia",
+    "Artéria", "Coração", "Pulmão", "Estômago", "Fígado", "Rim", "Intestino", "Bexiga", "Cérebro", "Crânio", "Costela", "Esqueleto"
+  ],
+  "Natureza & Espaço": [
+    "Sol", "Lua", "Estrela", "Planeta", "Terra", "Marte", "Júpiter", "Saturno", "Galáxia", "Universo", "Buraco Negro", "Cometa",
+    "Meteoro", "Asteroide", "Foguete", "Astronauta", "Alien", "Ovni", "Céu", "Nuvem", "Chuva", "Raio", "Trovão", "Tempestade",
+    "Neve", "Granizo", "Vento", "Furacão", "Tornado", "Terremoto", "Tsunami", "Vulcão", "Arco-Íris", "Aurora Boreal", "Nascer do Sol",
+    "Pôr do Sol", "Dia", "Noite", "Eclipse", "Mar", "Oceano", "Onda", "Praia", "Areia", "Ilha", "Rio", "Lago", "Lagoa", "Cachoeira",
+    "Montanha", "Morro", "Vale", "Deserto", "Floresta", "Selva", "Árvore", "Flor", "Rosa", "Girassol", "Margarida", "Orquídea",
+    "Cacto", "Grama", "Folha", "Pedra", "Rocha", "Terra", "Lama", "Fogo", "Fumaça", "Cinza", "Gelo", "Água", "Ar"
+  ],
+  "Veículos": [
+    "Carro", "Moto", "Caminhão", "Ônibus", "Bicicleta", "Skate", "Patins", "Patinete", "Avião", "Helicóptero", "Barco", "Navio",
+    "Lancha", "Submarino", "Trem", "Metrô", "Bonde", "Táxi", "Uber", "Ambulância", "Viatura de Polícia", "Carro de Bombeiro",
+    "Trator", "Escavadeira", "Guindaste", "Empilhadeira", "Foguete", "Disco Voador", "Balão", "Dirigível", "Paraquedas", "Asa Delta",
+    "Jet Ski", "Canoa", "Jangada", "Veleiro", "Cruzeiro", "Fusca", "Brasília", "Kombi", "Ferrari", "Lamborghini", "Porsche", "Camaro",
+    "Mustang", "Jeep", "Picape", "Van", "Limusine", "Carruagem", "Charrete", "Triciclo", "Quadriciclo", "Carrinho de Mão", "Carrinho de Bebê"
+  ],
+  "Marcas & Apps": [
+    "Coca-Cola", "Pepsi", "McDonald's", "Burger King", "Subway", "Starbucks", "Nestlé", "Garoto", "Lacta", "Kinder", "Nutella",
+    "Oreo", "Doritos", "Ruffles", "Cheetos", "Pringles", "M&M's", "Snickers", "KitKat", "Havaianas", "Nike", "Adidas", "Puma",
+    "Vans", "Converse", "Gucci", "Louis Vuitton", "Chanel", "Zara", "Renner", "Riachuelo", "C&A", "Apple", "iPhone", "Samsung",
+    "Xiaomi", "Motorola", "Nokia", "Sony", "LG", "Microsoft", "Windows", "Google", "Facebook", "Instagram", "WhatsApp", "TikTok",
+    "Twitter", "X", "YouTube", "Netflix", "Amazon", "Prime Video", "Disney+", "HBO Max", "Spotify", "Uber", "iFood", "Rappi",
+    "Mercado Livre", "Shopee", "AliExpress", "Shein", "Nubank", "Inter", "Itaú", "Bradesco", "Caixa", "Banco do Brasil", "Santander",
+    "Ferrari", "Lamborghini", "Porsche", "BMW", "Mercedes", "Audi", "Volkswagen", "Ford", "Chevrolet", "Fiat", "Toyota", "Honda",
+    "Hyundai", "Jeep", "Tesla", "PlayStation", "Xbox", "Nintendo", "Lego", "Barbie", "Hot Wheels", "Monopoly", "Uno", "Globo", "SBT"
+  ],
+  "História & Mitos": [
+    "Jesus", "Deus", "Diabo", "Anjo", "Demônio", "Papai Noel", "Coelhinho da Páscoa", "Fada do Dente", "Saci Pererê", "Curupira",
+    "Mula Sem Cabeça", "Boto Cor-de-Rosa", "Iara", "Boitatá", "Cuca", "Lobisomem", "Vampiro", "Drácula", "Frankenstein", "Múmia",
+    "Zumbi", "Fantasma", "Bruxa", "Fada", "Sereia", "Duende", "Gnomo", "Ogro", "Gigante", "Ciclope", "Minotauro", "Medusa", "Pégaso",
+    "Unicórnio", "Dragão", "Fênix", "Kraken", "Pé Grande", "Monstro do Lago Ness", "ET", "Alien", "Zeus", "Poseidon", "Hades", "Apolo",
+    "Ares", "Afrodite", "Atena", "Hércules", "Thor", "Odin", "Loki", "Anúbis", "Rá", "Buda", "Gandhi", "Einstein", "Newton",
+    "Da Vinci", "Picasso", "Van Gogh", "Mozart", "Beethoven", "Shakespeare", "Colombo", "Cabral", "Dom Pedro I", "Dom Pedro II",
+    "Tiradentes", "Zumbi dos Palmares", "Lampião", "Maria Bonita", "Getúlio Vargas", "Juscelino Kubitschek", "Lula", "Bolsonaro",
+    "Obama", "Trump", "Rainha Elizabeth", "Princesa Diana", "Hitler", "Napoleão", "César", "Cleópatra", "Rei Arthur", "Robin Hood"
+  ],
+  "Esportes & Lazer": [
+    "Futebol", "Vôlei", "Basquete", "Handebol", "Tênis", "Ping Pong", "Badminton", "Golfe", "Beisebol", "Futebol Americano", "Rugby",
+    "Hóquei", "Críquete", "Polo Aquático", "Natação", "Surfe", "Skate", "Patinação", "Ciclismo", "Corrida", "Atletismo", "Salto em Distância",
+    "Salto em Altura", "Ginástica", "Judô", "Karatê", "Jiu-Jitsu", "Taekwondo", "Boxe", "MMA", "Capoeira", "Luta Livre", "Esgrima",
+    "Arco e Flecha", "Tiro ao Alvo", "Hipismo", "Fórmula 1", "Kart", "Motocross", "Rali", "Paraquedismo", "Asa Delta", "Bungee Jumping",
+    "Escalada", "Trilha", "Acampamento", "Pesca", "Sinuca", "Boliche", "Dardo", "Xadrez", "Dama", "Dominó", "Baralho", "Poker", "Truco",
+    "Uno", "Videogame", "Palavras Cruzadas", "Quebra-Cabeça", "Dança", "Balé", "Samba", "Forró", "Funk", "Rock", "Pop", "Sertanejo",
+    "Pagode", "Música Clássica", "Violão", "Guitarra", "Baixo", "Bateria", "Teclado", "Piano", "Violino", "Saxofone", "Flauta", "Trompete",
+    "Gaita", "Acordeon", "Pandeiro", "Tambor", "Microfone", "Bola", "Chuteira", "Raquete", "Rede", "Gol", "Cesta", "Piscina", "Tatame"
+  ]
+};
+
+// Converte a estrutura RAW para o formato que o app usa
+const FULL_DATABASE = Object.entries(RAW_DATA).flatMap(([category, items]) => 
+  items.map(name => ({ name, category }))
+);
+
+// --- SOM ---
+const playSound = (type, muted) => {
+  if (muted) return;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const now = ctx.currentTime;
+
+  if (type === 'correct') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.1);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(300, now);
+    osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  } else if (type === 'tick') {
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(800, now);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  } else if (type === 'end') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.linearRampToValueAtTime(800, now + 0.5);
+    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+    osc.start(now);
+    osc.stop(now + 0.5);
+  }
+};
+
+// --- UTILS ---
+const shuffleArray = (array) => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
+export default function App() {
+  const [globalScore, setGlobalScore] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [gameState, setGameState] = useState('setup');
+  const [roundScore, setRoundScore] = useState(0);
+  const [roundMistakes, setRoundMistakes] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [selectedTime, setSelectedTime] = useState(60);
+  const [customTimeInput, setCustomTimeInput] = useState("");
+  
+  const [currentCard, setCurrentCard] = useState(null);
+  
+  const [flash, setFlash] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('Variados');
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  
+  const timerRef = useRef(null);
+  const deckRef = useRef([]); 
+
+  const uniqueCategories = useMemo(() => {
+    return ['Variados', ...Object.keys(RAW_DATA).sort()];
+  }, []);
+
+  // --- LÓGICA DE BARALHO INTELIGENTE ---
+  
+  const generateDeck = useCallback((category) => {
+    let rawDeck = FULL_DATABASE;
+    if (category !== 'Variados') {
+        rawDeck = FULL_DATABASE.filter(item => item.category === category);
+    }
+    return shuffleArray(rawDeck);
+  }, []);
+
+  const drawNextCard = useCallback(() => {
+    if (deckRef.current.length === 0) {
+        deckRef.current = generateDeck(selectedCategory);
+        
+        if (currentCard && deckRef.current.length > 1) {
+            const nextCard = deckRef.current[deckRef.current.length - 1]; 
+            if (nextCard.name === currentCard.name) {
+                const lastIdx = deckRef.current.length - 1;
+                [deckRef.current[lastIdx], deckRef.current[0]] = [deckRef.current[0], deckRef.current[lastIdx]];
+            }
+        }
+    }
+    
+    const card = deckRef.current.pop();
+    return { ...card, _uid: Math.random() };
+  }, [selectedCategory, generateDeck, currentCard]);
+
+
+  // --- FLUXO DO JOGO ---
+
+  const enterFullscreen = () => {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => console.log(err));
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        }
+    }
+  };
+
+  const startGame = () => {
+    let duration = selectedTime;
+    if (selectedTime === 'custom') {
+      const customMin = parseInt(customTimeInput);
+      duration = (customMin && customMin > 0 ? customMin : 1) * 60;
+    }
+
+    deckRef.current = generateDeck(selectedCategory);
+
+    setRoundScore(0);
+    setRoundMistakes(0);
+    setTimeLeft(duration);
+    
+    const card = deckRef.current.pop();
+    setCurrentCard({ ...card, _uid: Math.random() });
+    
+    setGameState('playing');
+
+    enterFullscreen();
+    if ('wakeLock' in navigator) {
+      navigator.wakeLock.request('screen').catch(e => console.log('Wake Lock denied', e));
+    }
+  };
+
+  const finishGame = useCallback(() => {
+    clearInterval(timerRef.current);
+    playSound('end', muted);
+    setGameState('finished');
+  }, [muted]);
+
+  const exitGame = () => {
+    clearInterval(timerRef.current);
+    setGameState('setup');
+  };
+
+  const resetAll = () => {
+    setGlobalScore(0);
+    setRoundScore(0);
+    setRoundMistakes(0);
+    setGameState('setup');
+  };
+
+  useEffect(() => {
+    if (gameState === 'playing') {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            finishGame();
+            return 0;
+          }
+          if (prev <= 10) playSound('tick', muted);
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [gameState, finishGame, muted]);
+
+  const handleAnswer = (type) => {
+    if (gameState !== 'playing') return;
+
+    setFlash(type === 'correct' ? 'green' : 'pink');
+    setTimeout(() => setFlash(null), 200);
+
+    playSound(type === 'correct' ? 'correct' : 'wrong', muted);
+
+    if (type === 'correct') {
+      setRoundScore(s => s + 1);
+      setGlobalScore(g => g + 1);
+    } else {
+      setRoundMistakes(m => m + 1);
+    }
+    
+    const next = drawNextCard();
+    setCurrentCard(next);
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  return (
+    <div className="fixed inset-0 w-full h-full bg-[#FFF1F2] overflow-hidden font-quicksand select-none touch-none">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Shrikhand&display=swap');
+        .retro-font { font-family: 'Shrikhand', cursive; letter-spacing: 1px; }
+        
+        .responsive-container {
+             width: 100%; height: 100%;
+             display: flex; flex-direction: column;
+             position: relative;
         }
 
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: #FFF1F2;
-            overflow: hidden; 
-            touch-action: none;
-            -webkit-user-select: none;
-            user-select: none;
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
-            margin: 0;
-            padding: 0;
+        @media screen and (orientation: portrait) {
+             .rotate-on-play {
+                 position: absolute; top: 50%; left: 50%;
+                 width: 100vh; height: 100vw;
+                 transform: translate(-50%, -50%) rotate(90deg);
+             }
         }
+        
+        @keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        h1, h2, h3, .retro-font {
-            font-family: 'Shrikhand', cursive;
-            letter-spacing: 1px;
-        }
-
-        .retro-shadow { box-shadow: 0.8vmin 0.8vmin 0px #14B8A6; }
-        .retro-shadow-active:active { transform: translate(2px, 2px); box-shadow: 0.4vmin 0.4vmin 0px #14B8A6; }
-        .retro-shadow-text { text-shadow: 0.4vmin 0.4vmin 0px #2DD4BF; }
-
-        /* Animações */
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(1deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
         @keyframes swing-q {
             0% { transform: rotate(-8deg); }
             50% { transform: rotate(8deg); }
@@ -59,916 +417,283 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.1); opacity: 0.8; }
         }
-
-        .animate-float { animation: float 4s ease-in-out infinite; }
-        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .animate-swing { animation: swing-q 3s ease-in-out infinite; transform-origin: center bottom; }
         .animate-pulse-soft { animation: pulse-soft 2s infinite; }
-
-        /* --- LÓGICA DE ROTAÇÃO E LAYOUT FLUIDO --- */
-        #orientation-wrapper {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100vw;
-            height: 100vh;
-            transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            box-sizing: border-box;
-        }
-
-        @media screen and (orientation: portrait) {
-            #orientation-wrapper {
-                width: 100vh;
-                height: 100vw;
-                transform: translate(-50%, -50%) rotate(90deg);
-                padding: 0; 
-            }
-        }
-
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            max-width: 900px;
-            padding: 2vh 4vw;
-            box-sizing: border-box;
-        }
-
-        .header-area {
-            flex: 0 0 auto;
-            margin-bottom: 1vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .card-area {
-            flex: 1 1 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            min-height: 0;
-            padding: 2vh 0;
-        }
-
-        .button-area {
-            flex: 0 0 auto;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 1vh;
-            padding-bottom: 2vh;
-        }
-
-        /* O Card em si - LARGURA EM 70% */
-        #card {
-            width: 70%;
-            height: 100%;
-            max-height: 55vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .title-text { font-size: clamp(24px, 8vmin, 48px); }
-        .btn-text { font-size: clamp(18px, 5vmin, 32px); }
         
-        #result-text {
-            line-height: 1.1;
+        .allow-interaction {
+            pointer-events: auto !important;
+            touch-action: manipulation !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
         }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-pink-50 to-yellow-50">
 
-    <div class="absolute top-[-10%] right-[-10%] w-[50vmin] h-[50vmin] bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] left-[-10%] w-[60vmin] h-[60vmin] bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float pointer-events-none" style="animation-delay: 2s"></div>
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #2dd4bf;
+          border-radius: 4px;
+        }
+      `}</style>
 
-    <div id="orientation-wrapper">
-        <div class="game-container">
-            
-            <div class="header-area">
-                <h1 class="title-text text-coral-500 retro-shadow-text text-[#FF9EAA] rotate-[-2deg] whitespace-nowrap">
-                    Cara a Cara
-                </h1>
-            </div>
-            
-            <div class="card-area">
-                <div id="card" class="bg-white border-4 border-yellow-300 rounded-[2rem] shadow-lg retro-shadow transition-all group relative">
-                    
-                    <div class="absolute top-2 left-4 w-[10vmin] h-[10vmin] z-20 pointer-events-none">
-                        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
-                             <path d="M85,130 C85,130 90,135 100,135 C110,135 115,130 115,130" stroke="#e5e7eb" stroke-width="8" stroke-linecap="round" transform="translate(4,4)" />
-                            <g class="animate-swing">
-                                <path d="M100,160 L100,120" stroke="#FF9EAA" stroke-width="25" stroke-linecap="round" />
-                                <circle cx="100" cy="180" r="14" fill="#2DD4BF" stroke="#fff" stroke-width="4" />
-                                <path d="M65,70 C65,20 135,20 135,70 C135,100 100,100 100,125" fill="none" stroke="#FF9EAA" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M75,70 C75,35 125,35 125,70 C125,90 100,90 100,110" fill="none" stroke="#FF7082" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
-                            </g>
-                            <text x="140" y="50" font-size="40" fill="#2DD4BF" class="animate-pulse-soft">✨</text>
-                        </svg>
-                    </div>
+      {flash && (
+        <div className={`fixed inset-0 z-50 pointer-events-none transition-opacity duration-200 ${flash === 'green' ? 'bg-green-500/40' : 'bg-[#FF7082]/40'}`} />
+      )}
 
-                    <div id="category-badge" class="absolute top-4 right-4 bg-teal-100 text-teal-600 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide hidden retro-font shadow-sm z-20">
-                        Categoria
-                    </div>
+      <div className={gameState === 'playing' ? "rotate-on-play responsive-container" : "responsive-container"}>
+        
+        {/* CABEÇALHO DO JOGO */}
+        {gameState === 'playing' && (
+          <div className="flex-shrink-0 h-[15%] w-full flex justify-between items-center px-8 sm:px-12 pt-4">
+             <div className="flex items-center gap-4">
+                <button 
+                   onClick={exitGame}
+                   className="p-3 bg-red-100 rounded-full text-red-500 border-2 border-red-200 shadow-sm active:scale-95 transition-transform"
+                   title="Sair do Jogo"
+                >
+                   <LogOut size={22} />
+                </button>
 
-                    <div id="result-content" class="text-center w-full z-10 flex flex-col items-center justify-center h-full px-6 py-4">
-                        <span id="placeholder-icon" class="text-[8vmin] mb-2 block animate-float">🎲</span>
-                        <h2 id="result-text" class="text-gray-700 retro-font break-words w-full" style="font-size: 6vmin;">
-                            Vamos Jogar?
+                <div className="flex flex-col items-start">
+                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total</span>
+                  <div className="flex items-center gap-2 bg-yellow-100 px-4 py-1.5 rounded-full border-2 border-yellow-300 shadow-sm transition-transform duration-200" key={globalScore}>
+                    <Trophy size={18} className="text-yellow-600" />
+                    <span className="retro-font text-xl text-yellow-700 animate-pop">{globalScore}</span>
+                  </div>
+                </div>
+             </div>
+
+             <div className="flex flex-col items-end">
+                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Tempo</span>
+                <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border-2 shadow-sm font-bold text-xl font-mono ${timeLeft <= 10 ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'bg-white border-gray-200 text-gray-600'}`}>
+                   {formatTime(timeLeft)}
+                </div>
+             </div>
+          </div>
+        )}
+
+        {/* ÁREA PRINCIPAL */}
+        <div className="flex-1 w-full flex items-center justify-center p-4 px-8 sm:px-16 relative">
+           
+           {/* === MENU === */}
+           {gameState === 'setup' && (
+             <div className="w-full max-w-md bg-white/70 backdrop-blur-md rounded-3xl border-4 border-[#FF9EAA] p-6 shadow-xl flex flex-col items-center gap-4 animate-pop relative z-10">
+                <div className="text-center">
+                   <h1 className="retro-font text-5xl text-[#FF7082] drop-shadow-[2px_2px_0px_#14B8A6] -rotate-2">
+                     Cara a Cara
+                   </h1>
+                </div>
+
+                <div className="w-full bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-inner flex flex-col gap-4 relative">
+                   
+                   {/* SELEÇÃO DE TEMPO */}
+                   <div>
+                     <p className="text-center text-xs font-bold text-gray-400 uppercase mb-2">Tempo da Partida</p>
+                     <div className="grid grid-cols-4 gap-2">
+                        {[60, 180, 300].map(sec => (
+                          <button 
+                            key={sec}
+                            onClick={() => setSelectedTime(sec)}
+                            className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === sec ? 'border-teal-400 bg-teal-50 text-teal-600 shadow-md transform scale-105' : 'border-transparent bg-gray-50 text-gray-400'}`}
+                          >
+                            <span className="text-lg font-bold">{sec / 60}</span>
+                            <span className="text-[9px] font-bold">MIN</span>
+                          </button>
+                        ))}
+                        
+                        <button 
+                           onClick={() => setSelectedTime('custom')}
+                           className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === 'custom' ? 'border-teal-400 bg-teal-50 text-teal-600' : 'border-transparent bg-gray-50 text-gray-400'}`}
+                        >
+                           <Settings size={18} />
+                           <span className="text-[9px] font-bold mt-1">??</span>
+                        </button>
+                     </div>
+
+                     {selectedTime === 'custom' && (
+                       <div className="mt-2 flex gap-2 items-center justify-center animate-pop">
+                          <input 
+                             type="number" 
+                             inputMode="numeric"
+                             pattern="[0-9]*"
+                             placeholder="0" 
+                             value={customTimeInput}
+                             onChange={(e) => setCustomTimeInput(e.target.value)}
+                             onPointerDown={(e) => e.stopPropagation()} 
+                             style={{ fontSize: '24px' }}
+                             className="allow-interaction w-24 p-2 text-center rounded-xl border-2 border-teal-200 font-bold text-teal-600 focus:outline-none focus:border-teal-500 bg-gray-50"
+                          />
+                          <span className="text-sm font-bold text-gray-400">minutos</span>
+                       </div>
+                     )}
+                   </div>
+
+                   {/* SELEÇÃO DE CATEGORIA - CUSTOMIZADO */}
+                   <div className="relative">
+                     <p className="text-center text-xs font-bold text-gray-400 uppercase mb-2">Categoria</p>
+                     
+                     <button 
+                        onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                        className="w-full p-3 rounded-xl border-2 border-teal-100 bg-teal-50 text-teal-700 flex items-center justify-between active:scale-[0.98] transition-all"
+                     >
+                        <span className="flex-1 text-center retro-font text-lg tracking-wide">{selectedCategory}</span>
+                        {isCategoryMenuOpen ? <ChevronUp size={24} className="text-teal-500"/> : <ChevronDown size={24} className="text-teal-500"/>}
+                     </button>
+
+                     {/* DROPDOWN CUSTOMIZADO */}
+                     {isCategoryMenuOpen && (
+                        <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl border-2 border-teal-200 shadow-xl max-h-[200px] overflow-y-auto custom-scrollbar z-50 animate-pop">
+                           {uniqueCategories.map(cat => (
+                              <button
+                                 key={cat}
+                                 onClick={() => {
+                                    setSelectedCategory(cat);
+                                    setIsCategoryMenuOpen(false);
+                                 }}
+                                 className={`w-full py-3 px-4 text-center font-bold text-sm border-b border-gray-50 last:border-0 hover:bg-teal-50 transition-colors ${selectedCategory === cat ? 'text-teal-600 bg-teal-50' : 'text-gray-600'}`}
+                              >
+                                 {cat}
+                              </button>
+                           ))}
+                        </div>
+                     )}
+                     
+                     {isCategoryMenuOpen && (
+                        <div className="fixed inset-0 z-40" onClick={() => setIsCategoryMenuOpen(false)}></div>
+                     )}
+                   </div>
+
+                </div>
+
+                <div className="flex items-center gap-2 bg-yellow-50 px-5 py-2 rounded-full border border-yellow-200">
+                    <span className="text-xs font-bold text-yellow-600 uppercase">Total Acumulado</span>
+                    <span className="retro-font text-2xl text-yellow-700">{globalScore}</span>
+                </div>
+
+                <div className="flex gap-3 w-full mt-2">
+                    <button onClick={() => setMuted(!muted)} className="p-4 bg-gray-100 rounded-2xl text-gray-500 hover:bg-gray-200 active:scale-95 transition-transform">
+                       {muted ? <VolumeX /> : <Volume2 />}
+                    </button>
+                    <button 
+                      onClick={startGame}
+                      className="flex-1 bg-[#FF7082] hover:bg-[#ff5a6e] text-white text-xl font-bold py-4 rounded-2xl shadow-[0px_4px_0px_#be123c] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
+                    >
+                       <Play fill="currentColor" /> INICIAR
+                    </button>
+                </div>
+                
+                {globalScore > 0 && (
+                  <button onClick={resetAll} className="text-xs text-red-300 font-bold flex items-center gap-1 hover:text-red-500 py-2">
+                     <Trash2 size={12} /> Zerar placar
+                  </button>
+                )}
+             </div>
+           )}
+
+           {/* === JOGO (PLAYING) === */}
+           {gameState === 'playing' && (
+             <div className="w-full h-full max-w-4xl flex flex-col items-center justify-center pb-2">
+                
+                <div className="flex-1 w-full relative mb-6 flex items-center justify-center">
+                    <div 
+                        key={currentCard?._uid}
+                        className="bg-white w-full h-full max-h-[60vh] rounded-[2rem] border-[6px] border-[#FF9EAA] shadow-lg flex flex-col items-center justify-center p-6 text-center animate-pop relative overflow-hidden"
+                    >
+                        
+                        <div className="absolute top-4 left-6 w-[12vmin] h-[12vmin] pointer-events-none opacity-90 z-10">
+                            <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-sm">
+                                <g className="animate-swing">
+                                    <path d="M100,160 L100,120" stroke="#FF9EAA" strokeWidth="25" strokeLinecap="round" />
+                                    <circle cx="100" cy="180" r="14" fill="#2DD4BF" stroke="#fff" strokeWidth="4" />
+                                    <path d="M65,70 C65,20 135,20 135,70 C135,100 100,100 100,125" fill="none" stroke="#FF9EAA" strokeWidth="25" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M75,70 C75,35 125,35 125,70 C125,90 100,90 100,110" fill="none" stroke="#FF7082" strokeWidth="6" strokeLinecap="round" opacity="0.6"/>
+                                </g>
+                                <text x="140" y="50" fontSize="40" fill="#2DD4BF" className="animate-pulse-soft">✨</text>
+                            </svg>
+                        </div>
+
+                        <div className="absolute top-6 right-6 bg-teal-100 text-teal-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide z-10 shadow-sm">
+                           {currentCard?.category}
+                        </div>
+                        
+                        <h2 className="retro-font text-[#374151] leading-none break-words w-full mt-8"
+                            style={{ fontSize: currentCard?.name.length > 15 ? '8vmin' : '13vmin' }}>
+                           {currentCard?.name}
                         </h2>
                     </div>
-
-                    <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-pink-50 rounded-full mix-blend-multiply opacity-50 pointer-events-none overflow-hidden"></div>
                 </div>
-            </div>
 
-            <div class="button-area">
-                <button onclick="sortear()" class="w-full max-w-[40%] bg-teal-400 hover:bg-teal-300 active:bg-teal-500 text-white btn-text py-[2vmin] rounded-full font-bold retro-shadow retro-shadow-active transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 retro-font tracking-wide z-20 shadow-md">
-                    <span id="btn-label">INICIAR</span>
-                </button>
-            </div>
+                {/* BOTÕES DE AÇÃO */}
+                <div className="w-full h-[25%] flex gap-6 px-4">
+                   <button 
+                      onPointerDown={() => handleAnswer('wrong')}
+                      className="flex-1 bg-[#FF7082] hover:bg-[#ff5a6e] active:bg-[#e11d48] rounded-[2rem] shadow-[0px_6px_0px_#be123c] active:translate-y-1 active:shadow-none transition-all flex flex-col items-center justify-center group"
+                   >
+                      <X size={48} className="text-white drop-shadow-md group-active:scale-90 transition-transform" />
+                      <span className="text-white font-bold uppercase tracking-wider text-sm mt-1">Pular / Errei</span>
+                   </button>
+
+                   <button 
+                      onPointerDown={() => handleAnswer('correct')}
+                      className="flex-1 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-[2rem] shadow-[0px_6px_0px_#15803d] active:translate-y-1 active:shadow-none transition-all flex flex-col items-center justify-center group"
+                   >
+                      <Check size={48} className="text-white drop-shadow-md group-active:scale-90 transition-transform" />
+                      <span className="text-white font-bold uppercase tracking-wider text-sm mt-1">Acertei!</span>
+                   </button>
+                </div>
+
+             </div>
+           )}
+
+           {/* === FIM DE JOGO === */}
+           {gameState === 'finished' && (
+             <div className="w-full max-w-md bg-white rounded-3xl border-4 border-gray-200 p-6 shadow-2xl flex flex-col items-center animate-pop relative">
+                
+                <div className="absolute -top-5 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg uppercase tracking-widest animate-pulse text-sm">
+                   Tempo Esgotado!
+                </div>
+
+                <div className="mt-6 text-center w-full">
+                   <h2 className="text-gray-400 font-bold text-sm uppercase mb-4">Resultado desta rodada</h2>
+                   <div className="flex justify-center gap-6 mb-6">
+                      <div className="flex flex-col items-center bg-green-50 p-4 rounded-2xl w-28">
+                         <span className="text-4xl font-bold text-green-500">{roundScore}</span>
+                         <span className="text-[10px] font-bold text-green-700 mt-1">ACERTOS</span>
+                      </div>
+                      <div className="flex flex-col items-center bg-red-50 p-4 rounded-2xl w-28">
+                         <span className="text-4xl font-bold text-[#FF7082]">{roundMistakes}</span>
+                         <span className="text-[10px] font-bold text-red-700 mt-1">ERROS</span>
+                      </div>
+                   </div>
+
+                   <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-6">
+                      <p className="text-yellow-700 text-xs font-bold uppercase">Total Acumulado</p>
+                      <div className="flex items-center justify-center gap-2 mt-1">
+                         <Trophy size={20} className="text-yellow-600" />
+                         <span className="retro-font text-2xl text-yellow-800">{globalScore} pts</span>
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-3 w-full">
+                      <button onClick={resetAll} className="bg-gray-200 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-300 flex items-center justify-center gap-2 text-sm">
+                         <RotateCcw size={16} /> Zerar Tudo
+                      </button>
+                      <button onClick={() => setGameState('setup')} className="bg-teal-500 text-white font-bold py-3 rounded-xl shadow-[0px_4px_0px_#0f766e] active:translate-y-1 active:shadow-none hover:bg-teal-400 flex items-center justify-center gap-2 text-sm">
+                         <Play size={16} fill="currentColor" /> Jogar Mais
+                      </button>
+                   </div>
+                </div>
+             </div>
+           )}
 
         </div>
+      </div>
     </div>
+  );
+}
 
-    <script>
-        // --- SCREEN WAKE LOCK & FULLSCREEN ---
-        let wakeLock = null;
-        
-        // 1. Manter a tela ligada
-        const requestWakeLock = async () => {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    wakeLock.addEventListener('release', () => console.log('Wake Lock released'));
-                }
-            } catch (err) { console.error(err); }
-        };
-
-        // 2. Colocar em Tela Cheia (Estilo Vídeo)
-        const enterFullscreen = () => {
-            const elem = document.documentElement;
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen().catch(err => console.log(err));
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                }
-            }
-        };
-
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock();
-        });
-
-        // --- BANCO DE DADOS GIGANTESCO ---
-        const database = [
-            // === COMIDAS TÍPICAS BRASILEIRAS ===
-            { name: "Feijoada", category: "Comida" },
-            { name: "Pão de Queijo", category: "Comida" },
-            { name: "Coxinha", category: "Salgado" },
-            { name: "Brigadeiro", category: "Doce" },
-            { name: "Acarajé", category: "Comida" },
-            { name: "Pamonha", category: "Comida" },
-            { name: "Churrasco", category: "Comida" },
-            { name: "Farofa", category: "Comida" },
-            { name: "Tapioca", category: "Comida" },
-            { name: "Açaí", category: "Comida" },
-            { name: "Pastel de Feira", category: "Salgado" },
-            { name: "Caldo de Cana", category: "Bebida" },
-            { name: "Guaraná", category: "Bebida" },
-            { name: "Paçoca", category: "Doce" },
-            { name: "Pudim de Leite", category: "Doce" },
-            { name: "Mousse de Maracujá", category: "Doce" },
-            { name: "Arroz e Feijão", category: "Comida" },
-            { name: "Biscoito Globo", category: "Comida" },
-            { name: "Cuscuz", category: "Comida" },
-            { name: "Moqueca", category: "Comida" },
-            { name: "Vatapá", category: "Comida" },
-            { name: "Romeu e Julieta", category: "Doce" },
-            { name: "Pé de Moleque", category: "Doce" },
-
-            // === PERSONAGENS DA TV BRASILEIRA ===
-            { name: "Chaves", category: "Personagem" },
-            { name: "Seu Madruga", category: "Personagem" },
-            { name: "Kiko", category: "Personagem" },
-            { name: "Chiquinha", category: "Personagem" },
-            { name: "Dona Florinda", category: "Personagem" },
-            { name: "Louro José", category: "TV Brasileira" },
-            { name: "Nazaré Tedesco", category: "Vilã" },
-            { name: "Carminha", category: "Vilã" },
-            { name: "Odete Roitman", category: "Vilã" },
-            { name: "Agostinho Carrara", category: "A Grande Família" },
-            { name: "Dona Nenê", category: "A Grande Família" },
-            { name: "Lineu Silva", category: "A Grande Família" },
-            { name: "Crô (Crodoaldo)", category: "Novela" },
-            { name: "Félix (Amor à Vida)", category: "Novela" },
-            { name: "Emília (Sítio)", category: "Sítio P. Amarelo" },
-            { name: "Visconde de Sabugosa", category: "Sítio P. Amarelo" },
-            { name: "Cuca", category: "Sítio P. Amarelo" },
-            { name: "Nino", category: "Castelo Rá-Tim-Bum" },
-            { name: "Celeste (Cobra)", category: "Castelo Rá-Tim-Bum" },
-            { name: "Porteiro do Castelo", category: "Castelo Rá-Tim-Bum" },
-            { name: "Priscila (TV Colosso)", category: "TV Brasileira" },
-            { name: "Xaropinho", category: "TV Brasileira" },
-
-            // === MEMES E INTERNET BR ===
-            { name: "Grávida de Taubaté", category: "Meme" },
-            { name: "Luva de Pedreiro", category: "Internet" },
-            { name: "Casimiro (Cazé)", category: "Internet" },
-            { name: "Caneta Azul", category: "Meme" },
-            { name: "Vira-lata Caramelo", category: "Ícone BR" },
-            { name: "Menina do Bambu", category: "Meme" },
-            { name: "Nissim Ourfali", category: "Meme" },
-            { name: "Inês Brasil", category: "Meme" },
-            { name: "Gretchen", category: "Rainha do Meme" },
-            { name: "Narcisa Tamborindeguy", category: "Internet" },
-            { name: "Whindersson Nunes", category: "YouTuber" },
-            { name: "Felipe Neto", category: "YouTuber" },
-            { name: "Choquei", category: "Internet" },
-            
-            // === FOLCLORE BRASILEIRO ===
-            { name: "Saci Pererê", category: "Lenda" },
-            { name: "Curupira", category: "Lenda" },
-            { name: "Mula Sem Cabeça", category: "Lenda" },
-            { name: "Boto Cor-de-Rosa", category: "Lenda" },
-            { name: "Iara", category: "Lenda" },
-            { name: "Boitatá", category: "Lenda" },
-            { name: "Cuca", category: "Lenda" },
-            { name: "Lobisomem", category: "Lenda" },
-
-            // === CELEBRIDADES & HISTÓRIA BR ===
-            { name: "Santos Dumont", category: "História" },
-            { name: "Pelé", category: "Rei" },
-            { name: "Ayrton Senna", category: "Ídolo" },
-            { name: "Gisele Bündchen", category: "Modelo" },
-            { name: "Carmen Miranda", category: "Ícone" },
-            { name: "Tiririca", category: "Comediante" },
-            { name: "Renato Aragão (Didi)", category: "Comediante" },
-            { name: "Dedé Santana", category: "Comediante" },
-            { name: "Mussum", category: "Comediante" },
-            { name: "Zacarias", category: "Comediante" },
-            { name: "Oscar Schmidt", category: "Basquete" },
-            { name: "Daiane dos Santos", category: "Ginasta" },
-            { name: "Rebeca Andrade", category: "Ginasta" },
-            { name: "Rayssa Leal", category: "Skatista" },
-            { name: "Guga (Kuerten)", category: "Tenista" },
-            { name: "Anderson Silva", category: "Lutador" },
-            { name: "Popó", category: "Lutador" },
-            { name: "Lampião", category: "História" },
-            { name: "Maria Bonita", category: "História" },
-            { name: "D. Pedro I", category: "Imperador" },
-            { name: "Tiradentes", category: "História" },
-
-            // === MÚSICA BRASILEIRA ===
-            { name: "Tim Maia", category: "Cantor" },
-            { name: "Cazuza", category: "Cantor" },
-            { name: "Renato Russo", category: "Legião Urbana" },
-            { name: "Chorão", category: "Charlie Brown Jr" },
-            { name: "Rita Lee", category: "Rainha do Rock" },
-            { name: "Elis Regina", category: "Cantora" },
-            { name: "Gilberto Gil", category: "Cantor" },
-            { name: "Caetano Veloso", category: "Cantor" },
-            { name: "Djavan", category: "Cantor" },
-            { name: "Alceu Valença", category: "Cantor" },
-            { name: "Luiz Gonzaga", category: "Rei do Baião" },
-            { name: "Marília Mendonça", category: "Rainha" },
-            { name: "Gusttavo Lima", category: "Cantor" },
-            { name: "Luan Santana", category: "Cantor" },
-            { name: "Zezé Di Camargo", category: "Cantor" },
-            { name: "Xororó", category: "Cantor" },
-            { name: "Leonardo", category: "Cantor" },
-            { name: "Daniel", category: "Cantor" },
-            { name: "Chitãozinho", category: "Cantor" },
-            { name: "Thiaguinho", category: "Cantor" },
-            { name: "Péricles", category: "Cantor" },
-            { name: "Belo", category: "Cantor" },
-            { name: "Ludmilla", category: "Cantora" },
-            { name: "Anitta", category: "Cantora" },
-            { name: "Luísa Sonza", category: "Cantora" },
-            { name: "Gloria Groove", category: "Cantora" },
-            { name: "Pabllo Vittar", category: "Cantora" },
-            { name: "Mamonas Assassinas", category: "Banda" },
-            { name: "Sandy", category: "Cantora" },
-            { name: "Junior Lima", category: "Músico" },
-            { name: "Sidney Magal", category: "Cantor" },
-            { name: "Reginaldo Rossi", category: "Rei do Brega" },
-
-            // === CULTURA POP INTERNACIONAL (FILMES/SÉRIES) ===
-            { name: "Harry Potter", category: "Filme" },
-            { name: "Hermione Granger", category: "Harry Potter" },
-            { name: "Rony Weasley", category: "Harry Potter" },
-            { name: "Dumbledore", category: "Harry Potter" },
-            { name: "Voldemort", category: "Vilão" },
-            { name: "Dobby", category: "Harry Potter" },
-            { name: "Darth Vader", category: "Star Wars" },
-            { name: "Yoda", category: "Star Wars" },
-            { name: "Luke Skywalker", category: "Star Wars" },
-            { name: "Princesa Leia", category: "Star Wars" },
-            { name: "Chewbacca", category: "Star Wars" },
-            { name: "Kylo Ren", category: "Star Wars" },
-            { name: "Homem de Ferro", category: "Marvel" },
-            { name: "Capitão América", category: "Marvel" },
-            { name: "Thor", category: "Marvel" },
-            { name: "Hulk", category: "Marvel" },
-            { name: "Viúva Negra", category: "Marvel" },
-            { name: "Homem-Aranha", category: "Marvel" },
-            { name: "Thanos", category: "Vilão" },
-            { name: "Deadpool", category: "Marvel" },
-            { name: "Batman", category: "DC" },
-            { name: "Superman", category: "DC" },
-            { name: "Mulher Maravilha", category: "DC" },
-            { name: "Coringa", category: "Vilão" },
-            { name: "Arlequina", category: "DC" },
-            { name: "Aquaman", category: "DC" },
-            { name: "Jack Sparrow", category: "Piratas" },
-            { name: "Willy Wonka", category: "Filme" },
-            { name: "Marty McFly", category: "De Volta p/ Futuro" },
-            { name: "Indiana Jones", category: "Filme" },
-            { name: "James Bond (007)", category: "Filme" },
-            { name: "Rocky Balboa", category: "Filme" },
-            { name: "Rambo", category: "Filme" },
-            { name: "O Exterminador", category: "Filme" },
-            { name: "Neo", category: "Matrix" },
-            { name: "John Wick", category: "Filme" },
-            { name: "Forrest Gump", category: "Filme" },
-            { name: "ET", category: "Filme" },
-            { name: "Gollum", category: "Senhor dos Anéis" },
-            { name: "Gandalf", category: "Senhor dos Anéis" },
-            { name: "Frodo", category: "Senhor dos Anéis" },
-            { name: "Jon Snow", category: "Game of Thrones" },
-            { name: "Daenerys", category: "Game of Thrones" },
-            { name: "Walter White", category: "Breaking Bad" },
-            { name: "Rachel Green", category: "Friends" },
-            { name: "Joey Tribbiani", category: "Friends" },
-            { name: "Eleven", category: "Stranger Things" },
-            { name: "Wandinha", category: "Série" },
-
-            // === DESENHOS & ANIMES ===
-            { name: "Goku", category: "Dragon Ball" },
-            { name: "Vegeta", category: "Dragon Ball" },
-            { name: "Naruto", category: "Anime" },
-            { name: "Sasuke", category: "Anime" },
-            { name: "Luffy", category: "One Piece" },
-            { name: "Pikachu", category: "Pokémon" },
-            { name: "Ash Ketchum", category: "Pokémon" },
-            { name: "Charizard", category: "Pokémon" },
-            { name: "Sakura", category: "Anime" },
-            { name: "Sailor Moon", category: "Anime" },
-            { name: "Cavaleiros do Zodíaco", category: "Anime" },
-            { name: "Bob Esponja", category: "Desenho" },
-            { name: "Patrick", category: "Desenho" },
-            { name: "Lula Molusco", category: "Desenho" },
-            { name: "Seu Sirigueijo", category: "Desenho" },
-            { name: "Homer Simpson", category: "Simpsons" },
-            { name: "Bart Simpson", category: "Simpsons" },
-            { name: "Marge Simpson", category: "Simpsons" },
-            { name: "Lisa Simpson", category: "Simpsons" },
-            { name: "Mickey Mouse", category: "Disney" },
-            { name: "Minnie", category: "Disney" },
-            { name: "Pato Donald", category: "Disney" },
-            { name: "Pateta", category: "Disney" },
-            { name: "Pluto", category: "Disney" },
-            { name: "Scooby-Doo", category: "Desenho" },
-            { name: "Salsicha", category: "Desenho" },
-            { name: "Tom", category: "Tom & Jerry" },
-            { name: "Jerry", category: "Tom & Jerry" },
-            { name: "Pica-Pau", category: "Desenho" },
-            { name: "Pernalonga", category: "Looney Tunes" },
-            { name: "Patolino", category: "Looney Tunes" },
-            { name: "Taz", category: "Looney Tunes" },
-            { name: "Frajola", category: "Looney Tunes" },
-            { name: "Piu-Piu", category: "Looney Tunes" },
-            { name: "Papa-Léguas", category: "Looney Tunes" },
-            { name: "Coyote", category: "Looney Tunes" },
-            { name: "Shrek", category: "Filme" },
-            { name: "Burro", category: "Shrek" },
-            { name: "Fiona", category: "Shrek" },
-            { name: "Gato de Botas", category: "Shrek" },
-            { name: "Gru", category: "Meu Malvado Favorito" },
-            { name: "Minion", category: "Meu Malvado Favorito" },
-            { name: "Elsa", category: "Frozen" },
-            { name: "Anna", category: "Frozen" },
-            { name: "Olaf", category: "Frozen" },
-            { name: "Woody", category: "Toy Story" },
-            { name: "Buzz Lightyear", category: "Toy Story" },
-            { name: "Relâmpago McQueen", category: "Carros" },
-            { name: "Po", category: "Kung Fu Panda" },
-            { name: "Mogli", category: "Disney" },
-            { name: "Simba", category: "Rei Leão" },
-            { name: "Timão", category: "Rei Leão" },
-            { name: "Pumba", category: "Rei Leão" },
-            { name: "Ariel", category: "Princesa" },
-            { name: "Cinderela", category: "Princesa" },
-            { name: "Branca de Neve", category: "Princesa" },
-            { name: "Bela (e a Fera)", category: "Princesa" },
-            { name: "Aladdin", category: "Disney" },
-            { name: "Gênio da Lâmpada", category: "Disney" },
-            { name: "Ben 10", category: "Desenho" },
-            { name: "Meninas Superpoderosas", category: "Desenho" },
-            { name: "Phineas e Ferb", category: "Desenho" },
-            { name: "Peppa Pig", category: "Infantil" },
-            { name: "Patrulha Canina", category: "Infantil" },
-            { name: "Galinha Pintadinha", category: "Infantil" },
-            { name: "Dora Aventureira", category: "Desenho" },
-
-            // === TURMA DA MÔNICA ===
-            { name: "Mônica", category: "Gibi" },
-            { name: "Cebolinha", category: "Gibi" },
-            { name: "Cascão", category: "Gibi" },
-            { name: "Magali", category: "Gibi" },
-            { name: "Chico Bento", category: "Gibi" },
-            { name: "Anjinho", category: "Gibi" },
-            { name: "Franjinha", category: "Gibi" },
-            { name: "Bidu", category: "Gibi" },
-            { name: "Sansão (Coelho)", category: "Gibi" },
-
-            // === OBJETOS DO DIA A DIA (FÁCIL/MÉDIO) ===
-            { name: "Guarda-Chuva", category: "Objeto" },
-            { name: "Chave", category: "Objeto" },
-            { name: "Carteira", category: "Objeto" },
-            { name: "Óculos de Sol", category: "Objeto" },
-            { name: "Relógio", category: "Objeto" },
-            { name: "Celular", category: "Tecnologia" },
-            { name: "Notebook", category: "Tecnologia" },
-            { name: "Fone de Ouvido", category: "Tecnologia" },
-            { name: "Carregador", category: "Objeto" },
-            { name: "Controle Remoto", category: "Objeto" },
-            { name: "Ventilador", category: "Eletro" },
-            { name: "Geladeira", category: "Eletro" },
-            { name: "Fogão", category: "Eletro" },
-            { name: "Micro-ondas", category: "Eletro" },
-            { name: "Liquidificador", category: "Eletro" },
-            { name: "Máquina de Lavar", category: "Eletro" },
-            { name: "Ferro de Passar", category: "Eletro" },
-            { name: "Aspirador de Pó", category: "Eletro" },
-            { name: "Secador de Cabelo", category: "Objeto" },
-            { name: "Escova de Dente", category: "Higiene" },
-            { name: "Pasta de Dente", category: "Higiene" },
-            { name: "Papel Higiênico", category: "Higiene" },
-            { name: "Sabonete", category: "Higiene" },
-            { name: "Shampoo", category: "Higiene" },
-            { name: "Toalha", category: "Objeto" },
-            { name: "Travesseiro", category: "Quarto" },
-            { name: "Cobertor", category: "Quarto" },
-            { name: "Cama", category: "Móvel" },
-            { name: "Sofá", category: "Móvel" },
-            { name: "Cadeira", category: "Móvel" },
-            { name: "Mesa", category: "Móvel" },
-            { name: "Espelho", category: "Objeto" },
-            { name: "Vassoura", category: "Limpeza" },
-            { name: "Rodo", category: "Limpeza" },
-            { name: "Balde", category: "Limpeza" },
-            { name: "Pano de Prato", category: "Cozinha" },
-            { name: "Panela", category: "Cozinha" },
-            { name: "Frigideira", category: "Cozinha" },
-            { name: "Garfo", category: "Talher" },
-            { name: "Faca", category: "Talher" },
-            { name: "Colher", category: "Talher" },
-            { name: "Copo", category: "Objeto" },
-            { name: "Prato", category: "Objeto" },
-            { name: "Caneta", category: "Papelaria" },
-            { name: "Lápis", category: "Papelaria" },
-            { name: "Borracha", category: "Papelaria" },
-            { name: "Caderno", category: "Papelaria" },
-            { name: "Tesoura", category: "Objeto" },
-            { name: "Mochila", category: "Objeto" },
-            { name: "Chinelo", category: "Calçado" },
-            { name: "Tênis", category: "Calçado" },
-            { name: "Botas", category: "Calçado" },
-            { name: "Meia", category: "Roupa" },
-            { name: "Calça Jeans", category: "Roupa" },
-            { name: "Camiseta", category: "Roupa" },
-            { name: "Vestido", category: "Roupa" },
-            { name: "Boné", category: "Acessório" },
-            { name: "Anel", category: "Joia" },
-            { name: "Colar", category: "Joia" },
-            { name: "Brinco", category: "Joia" },
-
-            // === OBJETOS ESPECÍFICOS (DESAFIO) ===
-            { name: "Cortador de Unha", category: "Objeto" },
-            { name: "Desentupidor", category: "Banheiro" },
-            { name: "Grampeador", category: "Escritório" },
-            { name: "Clips de Papel", category: "Escritório" },
-            { name: "Fita Durex", category: "Objeto" },
-            { name: "Isqueiro", category: "Objeto" },
-            { name: "Fósforo", category: "Objeto" },
-            { name: "Vela", category: "Objeto" },
-            { name: "Chave de Fenda", category: "Ferramenta" },
-            { name: "Martelo", category: "Ferramenta" },
-            { name: "Serrote", category: "Ferramenta" },
-            { name: "Alicate", category: "Ferramenta" },
-            { name: "Trena", category: "Ferramenta" },
-            { name: "Extensão Elétrica", category: "Objeto" },
-            { name: "Adaptador de Tomada", category: "Objeto" },
-            { name: "Pen Drive", category: "Tecnologia" },
-            { name: "Mouse", category: "Tecnologia" },
-            { name: "Teclado", category: "Tecnologia" },
-            { name: "Impressora", category: "Tecnologia" },
-            { name: "Roteador Wi-Fi", category: "Tecnologia" },
-
-            // === ANIMAIS (EXPANDIDO) ===
-            { name: "Cachorro", category: "Animal" },
-            { name: "Gato", category: "Animal" },
-            { name: "Papagaio", category: "Ave" },
-            { name: "Periquito", category: "Ave" },
-            { name: "Canário", category: "Ave" },
-            { name: "Galinha", category: "Ave" },
-            { name: "Galo", category: "Ave" },
-            { name: "Pato", category: "Ave" },
-            { name: "Vaca", category: "Fazenda" },
-            { name: "Boi", category: "Fazenda" },
-            { name: "Cavalo", category: "Fazenda" },
-            { name: "Porco", category: "Fazenda" },
-            { name: "Ovelha", category: "Fazenda" },
-            { name: "Cabra", category: "Fazenda" },
-            { name: "Leão", category: "Selva" },
-            { name: "Tigre", category: "Selva" },
-            { name: "Elefante", category: "Selva" },
-            { name: "Girafa", category: "Selva" },
-            { name: "Macaco", category: "Selva" },
-            { name: "Zebra", category: "Selva" },
-            { name: "Hipopótamo", category: "Selva" },
-            { name: "Rinoceronte", category: "Selva" },
-            { name: "Urso", category: "Selva" },
-            { name: "Urso Panda", category: "Selva" },
-            { name: "Lobo", category: "Selva" },
-            { name: "Raposa", category: "Selva" },
-            { name: "Coelho", category: "Animal" },
-            { name: "Hamster", category: "Animal" },
-            { name: "Tartaruga", category: "Réptil" },
-            { name: "Jacaré", category: "Réptil" },
-            { name: "Cobra", category: "Réptil" },
-            { name: "Sapo", category: "Anfíbio" },
-            { name: "Peixe", category: "Marinho" },
-            { name: "Tubarão", category: "Marinho" },
-            { name: "Baleia", category: "Marinho" },
-            { name: "Golfinho", category: "Marinho" },
-            { name: "Polvo", category: "Marinho" },
-            { name: "Lula", category: "Marinho" },
-            { name: "Caranguejo", category: "Marinho" },
-            { name: "Camarão", category: "Marinho" },
-            { name: "Pinguim", category: "Ave" },
-            { name: "Águia", category: "Ave" },
-            { name: "Coruja", category: "Ave" },
-            { name: "Morcego", category: "Animal" },
-            { name: "Borboleta", category: "Inseto" },
-            { name: "Abelha", category: "Inseto" },
-            { name: "Formiga", category: "Inseto" },
-            { name: "Barata", category: "Inseto" },
-            { name: "Mosca", category: "Inseto" },
-            { name: "Pernilongo", category: "Inseto" },
-            { name: "Aranha", category: "Animal" },
-            { name: "Escorpião", category: "Animal" },
-            { name: "Capivara", category: "Brasil" },
-            { name: "Tatu", category: "Brasil" },
-            { name: "Tamanduá", category: "Brasil" },
-            { name: "Mico Leão Dourado", category: "Brasil" },
-            { name: "Onça Pintada", category: "Brasil" },
-            { name: "Preguiça", category: "Brasil" },
-            { name: "Tucano", category: "Brasil" },
-            { name: "Arara", category: "Brasil" },
-
-            // === FRUTAS, VERDURAS & PLANTAS ===
-            { name: "Banana", category: "Fruta" },
-            { name: "Maçã", category: "Fruta" },
-            { name: "Laranja", category: "Fruta" },
-            { name: "Limão", category: "Fruta" },
-            { name: "Uva", category: "Fruta" },
-            { name: "Melancia", category: "Fruta" },
-            { name: "Melão", category: "Fruta" },
-            { name: "Abacaxi", category: "Fruta" },
-            { name: "Morango", category: "Fruta" },
-            { name: "Pera", category: "Fruta" },
-            { name: "Manga", category: "Fruta" },
-            { name: "Mamão", category: "Fruta" },
-            { name: "Abacate", category: "Fruta" },
-            { name: "Coco", category: "Fruta" },
-            { name: "Maracujá", category: "Fruta" },
-            { name: "Kiwi", category: "Fruta" },
-            { name: "Cereja", category: "Fruta" },
-            { name: "Pêssego", category: "Fruta" },
-            { name: "Ameixa", category: "Fruta" },
-            { name: "Goiaba", category: "Fruta" },
-            { name: "Caju", category: "Fruta" },
-            { name: "Jabuticaba", category: "Fruta" },
-            { name: "Jaca", category: "Fruta" },
-            { name: "Caqui", category: "Fruta" },
-            { name: "Figo", category: "Fruta" },
-            { name: "Amora", category: "Fruta" },
-            { name: "Tomate", category: "Legume" },
-            { name: "Batata", category: "Legume" },
-            { name: "Cenoura", category: "Legume" },
-            { name: "Alface", category: "Verdura" },
-            { name: "Cebola", category: "Legume" },
-            { name: "Alho", category: "Tempero" },
-            { name: "Brócolis", category: "Verdura" },
-            { name: "Couve", category: "Verdura" },
-            { name: "Espinafre", category: "Verdura" },
-            { name: "Repolho", category: "Verdura" },
-            { name: "Pepino", category: "Legume" },
-            { name: "Abóbora", category: "Legume" },
-            { name: "Chuchu", category: "Legume" },
-            { name: "Beterraba", category: "Legume" },
-            { name: "Pimentão", category: "Legume" },
-            { name: "Milho", category: "Legume" },
-            { name: "Feijão", category: "Grão" },
-            { name: "Arroz", category: "Grão" },
-            { name: "Trigo", category: "Grão" },
-            { name: "Café", category: "Grão" },
-            { name: "Flor", category: "Planta" },
-            { name: "Rosa", category: "Flor" },
-            { name: "Girassol", category: "Flor" },
-            { name: "Margarida", category: "Flor" },
-            { name: "Orquídea", category: "Flor" },
-            { name: "Cacto", category: "Planta" },
-            { name: "Árvore", category: "Planta" },
-
-            // === PROFISSÕES ===
-            { name: "Médico", category: "Profissão" },
-            { name: "Enfermeiro", category: "Profissão" },
-            { name: "Dentista", category: "Profissão" },
-            { name: "Veterinário", category: "Profissão" },
-            { name: "Professor", category: "Profissão" },
-            { name: "Policial", category: "Profissão" },
-            { name: "Bombeiro", category: "Profissão" },
-            { name: "Advogado", category: "Profissão" },
-            { name: "Juiz", category: "Profissão" },
-            { name: "Engenheiro", category: "Profissão" },
-            { name: "Arquiteto", category: "Profissão" },
-            { name: "Pedreiro", category: "Profissão" },
-            { name: "Pintor", category: "Profissão" },
-            { name: "Eletricista", category: "Profissão" },
-            { name: "Mecânico", category: "Profissão" },
-            { name: "Motorista", category: "Profissão" },
-            { name: "Piloto de Avião", category: "Profissão" },
-            { name: "Astronauta", category: "Profissão" },
-            { name: "Cientista", category: "Profissão" },
-            { name: "Cozinheiro", category: "Profissão" },
-            { name: "Garçom", category: "Profissão" },
-            { name: "Padeiro", category: "Profissão" },
-            { name: "Cabeleireiro", category: "Profissão" },
-            { name: "Manicure", category: "Profissão" },
-            { name: "Ator", category: "Profissão" },
-            { name: "Cantor", category: "Profissão" },
-            { name: "Jogador de Futebol", category: "Profissão" },
-            { name: "Jornalista", category: "Profissão" },
-            { name: "Fotógrafo", category: "Profissão" },
-            { name: "Youtuber", category: "Profissão" },
-            { name: "Palhaço", category: "Profissão" },
-            { name: "Mágico", category: "Profissão" },
-
-            // === LUGARES FAMOSOS ===
-            { name: "Cristo Redentor", category: "Brasil" },
-            { name: "Pão de Açúcar", category: "Brasil" },
-            { name: "Torre Eiffel", category: "França" },
-            { name: "Estátua da Liberdade", category: "EUA" },
-            { name: "Disney", category: "EUA" },
-            { name: "Coliseu", category: "Itália" },
-            { name: "Muralha da China", category: "China" },
-            { name: "Pirâmides", category: "Egito" },
-            { name: "Praia de Copacabana", category: "Brasil" },
-            { name: "Avenida Paulista", category: "Brasil" },
-            { name: "Maracanã", category: "Estádio" },
-            { name: "Amazônia", category: "Brasil" },
-            { name: "Pantanal", category: "Brasil" },
-            { name: "Cataratas do Iguaçu", category: "Brasil" },
-            { name: "Fernando de Noronha", category: "Brasil" },
-
-            // === VEÍCULOS ===
-            { name: "Carro", category: "Veículo" },
-            { name: "Moto", category: "Veículo" },
-            { name: "Bicicleta", category: "Veículo" },
-            { name: "Ônibus", category: "Veículo" },
-            { name: "Caminhão", category: "Veículo" },
-            { name: "Trem", category: "Veículo" },
-            { name: "Metrô", category: "Veículo" },
-            { name: "Avião", category: "Veículo" },
-            { name: "Helicóptero", category: "Veículo" },
-            { name: "Barco", category: "Veículo" },
-            { name: "Navio", category: "Veículo" },
-            { name: "Lancha", category: "Veículo" },
-            { name: "Submarino", category: "Veículo" },
-            { name: "Foguete", category: "Veículo" },
-            { name: "Skate", category: "Veículo" },
-            { name: "Patins", category: "Veículo" },
-            { name: "Patinete", category: "Veículo" },
-            { name: "Fusca", category: "Clássico" },
-            { name: "Brasília Amarela", category: "Mamonas" },
-
-            // === CELEBRIDADES INTERNACIONAIS (MÚSICA/POP) ===
-            { name: "Michael Jackson", category: "Rei do Pop" },
-            { name: "Madonna", category: "Rainha do Pop" },
-            { name: "Beyoncé", category: "Diva" },
-            { name: "Rihanna", category: "Cantora" },
-            { name: "Lady Gaga", category: "Cantora" },
-            { name: "Taylor Swift", category: "Cantora" },
-            { name: "Justin Bieber", category: "Cantor" },
-            { name: "Katy Perry", category: "Cantora" },
-            { name: "Shakira", category: "Cantora" },
-            { name: "Adele", category: "Cantora" },
-            { name: "Elvis Presley", category: "Rei do Rock" },
-            { name: "Freddie Mercury", category: "Queen" },
-            { name: "John Lennon", category: "Beatles" },
-            { name: "Paul McCartney", category: "Beatles" },
-            { name: "Eminem", category: "Rapper" },
-            { name: "Snoop Dogg", category: "Rapper" },
-            { name: "Bruno Mars", category: "Cantor" },
-            { name: "Ed Sheeran", category: "Cantor" },
-            { name: "Ariana Grande", category: "Cantora" },
-            { name: "Billie Eilish", category: "Cantora" },
-            { name: "Dua Lipa", category: "Cantora" },
-
-            // === CELEBRIDADES INTERNACIONAIS (ATORES) ===
-            { name: "Brad Pitt", category: "Ator" },
-            { name: "Angelina Jolie", category: "Atriz" },
-            { name: "Leonardo DiCaprio", category: "Ator" },
-            { name: "Tom Cruise", category: "Ator" },
-            { name: "Will Smith", category: "Ator" },
-            { name: "Johnny Depp", category: "Ator" },
-            { name: "The Rock (Dwayne)", category: "Ator" },
-            { name: "Vin Diesel", category: "Ator" },
-            { name: "Robert Downey Jr", category: "Ator" },
-            { name: "Chris Hemsworth", category: "Ator" },
-            { name: "Scarlett Johansson", category: "Atriz" },
-            { name: "Jennifer Aniston", category: "Atriz" },
-            { name: "Julia Roberts", category: "Atriz" },
-            { name: "Meryl Streep", category: "Atriz" },
-            { name: "Tom Hanks", category: "Ator" },
-            { name: "Jim Carrey", category: "Comediante" },
-            { name: "Adam Sandler", category: "Comediante" },
-            { name: "Marilyn Monroe", category: "Ícone" },
-            { name: "Keanu Reeves", category: "Ator" },
-            
-            // === ESPORTE INTERNACIONAL ===
-            { name: "Messi", category: "Futebol" },
-            { name: "Cristiano Ronaldo", category: "Futebol" },
-            { name: "Mbappé", category: "Futebol" },
-            { name: "Maradona", category: "Futebol" },
-            { name: "Michael Jordan", category: "Basquete" },
-            { name: "LeBron James", category: "Basquete" },
-            { name: "Kobe Bryant", category: "Basquete" },
-            { name: "Usain Bolt", category: "Velocista" },
-            { name: "Michael Phelps", category: "Natação" },
-            { name: "Serena Williams", category: "Tênis" },
-            { name: "Rafael Nadal", category: "Tênis" },
-            { name: "Roger Federer", category: "Tênis" },
-            { name: "Lewis Hamilton", category: "F1" },
-            { name: "Max Verstappen", category: "F1" },
-            { name: "Tom Brady", category: "Futebol Americano" },
-            { name: "Mike Tyson", category: "Boxe" },
-            { name: "Muhammad Ali", category: "Boxe" },
-
-            // === MARCAS FAMOSAS ===
-            { name: "Coca-Cola", category: "Marca" },
-            { name: "McDonald's", category: "Marca" },
-            { name: "Apple", category: "Marca" },
-            { name: "Samsung", category: "Marca" },
-            { name: "Nike", category: "Marca" },
-            { name: "Adidas", category: "Marca" },
-            { name: "Google", category: "Marca" },
-            { name: "Facebook", category: "Marca" },
-            { name: "Instagram", category: "Marca" },
-            { name: "WhatsApp", category: "App" },
-            { name: "Netflix", category: "Marca" },
-            { name: "YouTube", category: "Site" },
-            { name: "Havaianas", category: "Marca BR" },
-            { name: "Bombril", category: "Marca BR" },
-            { name: "Omo", category: "Marca" },
-            { name: "Nestlé", category: "Marca" },
-            { name: "Ferrari", category: "Marca" },
-
-            // === CORPO HUMANO ===
-            { name: "Coração", category: "Órgão" },
-            { name: "Cérebro", category: "Órgão" },
-            { name: "Pulmão", category: "Órgão" },
-            { name: "Estômago", category: "Órgão" },
-            { name: "Osso", category: "Corpo" },
-            { name: "Sangue", category: "Corpo" },
-            { name: "Dente", category: "Corpo" },
-            { name: "Língua", category: "Corpo" },
-            { name: "Olho", category: "Corpo" },
-            { name: "Orelha", category: "Corpo" },
-            { name: "Nariz", category: "Corpo" },
-            { name: "Boca", category: "Corpo" },
-            { name: "Mão", category: "Corpo" },
-            { name: "Pé", category: "Corpo" },
-            { name: "Braço", category: "Corpo" },
-            { name: "Perna", category: "Corpo" },
-            { name: "Cabelo", category: "Corpo" },
-            { name: "Unha", category: "Corpo" },
-            { name: "Pele", category: "Corpo" },
-            { name: "Umbigo", category: "Corpo" },
-
-            // === NATUREZA & CLIMA ===
-            { name: "Sol", category: "Astro" },
-            { name: "Lua", category: "Astro" },
-            { name: "Estrela", category: "Astro" },
-            { name: "Nuvem", category: "Clima" },
-            { name: "Chuva", category: "Clima" },
-            { name: "Raio", category: "Clima" },
-            { name: "Trovão", category: "Clima" },
-            { name: "Neve", category: "Clima" },
-            { name: "Vento", category: "Clima" },
-            { name: "Arco-Íris", category: "Fenômeno" },
-            { name: "Fogo", category: "Elemento" },
-            { name: "Água", category: "Elemento" },
-            { name: "Terra", category: "Elemento" },
-            { name: "Ar", category: "Elemento" },
-            { name: "Mar", category: "Natureza" },
-            { name: "Rio", category: "Natureza" },
-            { name: "Lagoa", category: "Natureza" },
-            { name: "Cachoeira", category: "Natureza" },
-            { name: "Montanha", category: "Natureza" },
-            { name: "Vulcão", category: "Natureza" },
-            { name: "Deserto", category: "Natureza" },
-            { name: "Floresta", category: "Natureza" },
-            { name: "Pedra", category: "Natureza" },
-            { name: "Areia", category: "Natureza" },
-
-            // === COISAS ALEATÓRIAS / DIFÍCEIS ===
-            { name: "Dinossauro", category: "Extinto" },
-            { name: "T-Rex", category: "Extinto" },
-            { name: "Múmia", category: "Monstro" },
-            { name: "Vampiro", category: "Monstro" },
-            { name: "Zumbi", category: "Monstro" },
-            { name: "Fantasma", category: "Monstro" },
-            { name: "Bruxa", category: "Monstro" },
-            { name: "Fada", category: "Mágico" },
-            { name: "Sereia", category: "Mágico" },
-            { name: "Unicórnio", category: "Mágico" },
-            { name: "Dragão", category: "Mágico" },
-            { name: "Extraterrestre", category: "Sci-Fi" },
-            { name: "Robô", category: "Sci-Fi" },
-            { name: "Pirata", category: "Personagem" },
-            { name: "Rei", category: "Realeza" },
-            { name: "Rainha", category: "Realeza" },
-            { name: "Príncipe", category: "Realeza" },
-            { name: "Princesa", category: "Realeza" },
-            { name: "Noiva", category: "Casamento" },
-            { name: "Bebê", category: "Pessoa" },
-            { name: "Vovó", category: "Pessoa" }
-        ];
-
-        function sortear() {
-            // Tenta ativar os recursos de tela (WakeLock e Fullscreen)
-            if (!wakeLock) requestWakeLock();
-            enterFullscreen();
-
-            const resultText = document.getElementById('result-text');
-            const placeholderIcon = document.getElementById('placeholder-icon');
-            const badge = document.getElementById('category-badge');
-            const card = document.getElementById('card');
-            const btnLabel = document.getElementById('btn-label');
-
-            // Muda o texto do botão para "PRÓXIMO"
-            if (btnLabel.textContent === "INICIAR") {
-                btnLabel.textContent = "PRÓXIMO";
-            }
-
-            resultText.classList.remove('animate-pop');
-            void resultText.offsetWidth;
-
-            const randomIndex = Math.floor(Math.random() * database.length);
-            const selected = database[randomIndex];
-
-            placeholderIcon.style.display = 'none';
-            resultText.textContent = selected.name;
-            resultText.classList.add('animate-pop');
-            
-            // Ajuste dinâmico de fonte
-            if (selected.name.length > 20) {
-                resultText.style.fontSize = '4.5vmin';
-            } else if (selected.name.length > 12) {
-                resultText.style.fontSize = '5.5vmin';
-            } else {
-                resultText.style.fontSize = '6.5vmin';
-            }
-            
-            const colors = ['bg-yellow-100 text-yellow-700', 'bg-red-100 text-red-700', 'bg-teal-100 text-teal-700', 'bg-blue-100 text-blue-700', 'bg-pink-100 text-pink-700', 'bg-purple-100 text-purple-700', 'bg-orange-100 text-orange-700'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            badge.className = `absolute top-4 right-4 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide animate-pop retro-font ${randomColor} shadow-sm z-20`;
-            badge.textContent = selected.category;
-            badge.style.display = 'block';
-
-            const borders = ['border-yellow-300', 'border-teal-300', 'border-pink-300', 'border-blue-300', 'border-purple-300'];
-            card.classList.remove(...borders);
-            card.classList.add(borders[Math.floor(Math.random() * borders.length)]);
-        }
-    </script>
-</body>
-</html>
 
