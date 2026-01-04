@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Cara a Cara Retro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Shrikhand&display=swap" rel="stylesheet">
@@ -36,10 +36,9 @@
             letter-spacing: 1px;
         }
 
-        .retro-shadow { box-shadow: 4px 4px 0px #14B8A6; }
-        .retro-shadow-active:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #14B8A6; }
-        .retro-shadow-text { text-shadow: 2px 2px 0px #2DD4BF; }
-        .retro-shadow-text-pink { text-shadow: 2px 2px 0px #FF9EAA; }
+        .retro-shadow { box-shadow: 0.8vmin 0.8vmin 0px #14B8A6; }
+        .retro-shadow-active:active { transform: translate(2px, 2px); box-shadow: 0.4vmin 0.4vmin 0px #14B8A6; }
+        .retro-shadow-text { text-shadow: 0.4vmin 0.4vmin 0px #2DD4BF; }
 
         /* Animações */
         @keyframes float {
@@ -66,7 +65,7 @@
         .animate-swing { animation: swing-q 3s ease-in-out infinite; transform-origin: center bottom; }
         .animate-pulse-soft { animation: pulse-soft 2s infinite; }
 
-        /* --- LÓGICA DE ROTAÇÃO E LAYOUT --- */
+        /* --- LÓGICA DE ROTAÇÃO E LAYOUT FLUIDO --- */
         #orientation-wrapper {
             position: absolute;
             top: 50%;
@@ -78,6 +77,8 @@
             width: 100vw;
             height: 100vh;
             transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            box-sizing: border-box;
         }
 
         @media screen and (orientation: portrait) {
@@ -85,6 +86,7 @@
                 width: 100vh;
                 height: 100vw;
                 transform: translate(-50%, -50%) rotate(90deg);
+                padding: 0; 
             }
         }
 
@@ -92,104 +94,142 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             width: 100%;
             height: 100%;
             max-width: 900px;
-            padding: 1rem;
+            padding: 2vh 4vw;
+            box-sizing: border-box;
         }
 
-        /* Unidades vmin garantem escala perfeita independente da orientação */
-        .title-text { font-size: 8vmin; }
-        .card-text { font-size: 6.5vmin; }
-        .btn-text { font-size: 4vmin; }
+        .header-area {
+            flex: 0 0 auto;
+            margin-bottom: 1vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-area {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 0;
+            padding: 2vh 0;
+        }
+
+        .button-area {
+            flex: 0 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 1vh;
+            padding-bottom: 2vh;
+        }
+
+        /* O Card em si - LARGURA AJUSTADA PARA 70% */
+        #card {
+            width: 70%; /* Antes era 85% */
+            height: 100%;
+            max-height: 55vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .title-text { font-size: clamp(24px, 8vmin, 48px); }
+        .btn-text { font-size: clamp(18px, 5vmin, 32px); }
+        
+        #result-text {
+            line-height: 1.1;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-yellow-50">
 
     <!-- Fundo Decorativo -->
-    <div class="absolute top-[-10%] right-[-10%] w-[50vmin] h-[50vmin] bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float"></div>
-    <div class="absolute bottom-[-10%] left-[-10%] w-[60vmin] h-[60vmin] bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float" style="animation-delay: 2s"></div>
+    <div class="absolute top-[-10%] right-[-10%] w-[50vmin] h-[50vmin] bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[60vmin] h-[60vmin] bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float pointer-events-none" style="animation-delay: 2s"></div>
 
     <!-- Wrapper de Orientação -->
     <div id="orientation-wrapper">
         <div class="game-container">
             
-            <!-- Título -->
-            <h1 class="title-text text-coral-500 mb-4 retro-shadow-text text-[#FF9EAA] rotate-[-2deg] whitespace-nowrap">
-                Cara a Cara
-            </h1>
+            <!-- ÁREA 1: Título -->
+            <div class="header-area">
+                <h1 class="title-text text-coral-500 retro-shadow-text text-[#FF9EAA] rotate-[-2deg] whitespace-nowrap">
+                    Cara a Cara
+                </h1>
+            </div>
             
-            <!-- Card Principal -->
-            <div id="card" class="relative bg-white border-4 border-yellow-300 w-full max-w-[85%] aspect-[16/7] rounded-[2rem] flex flex-col items-center justify-center p-4 mb-6 retro-shadow transition-all group shadow-lg">
-                
-                <!-- Ícone Interrogação Bonito (AGORA NA ESQUERDA: left-4) -->
-                <div class="absolute top-2 left-4 w-[12vmin] h-[12vmin] z-20 pointer-events-none">
-                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
-                         <!-- Sombra da interrogação -->
-                         <path d="M85,130 C85,130 90,135 100,135 C110,135 115,130 115,130" stroke="#e5e7eb" stroke-width="8" stroke-linecap="round" transform="translate(4,4)" />
-                        
-                        <!-- Corpo da Interrogação Animada -->
-                        <g class="animate-swing">
-                            <!-- Haste -->
-                            <path d="M100,160 L100,120" stroke="#FF9EAA" stroke-width="25" stroke-linecap="round" />
-                            <!-- Ponto -->
-                            <circle cx="100" cy="180" r="14" fill="#2DD4BF" stroke="#fff" stroke-width="4" />
-                            
-                            <!-- Curva superior -->
-                            <path d="M65,70 C65,20 135,20 135,70 C135,100 100,100 100,125" 
-                                fill="none" 
-                                stroke="#FF9EAA" 
-                                stroke-width="25" 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round"
-                            />
-                            
-                            <!-- Brilho interno -->
-                            <path d="M75,70 C75,35 125,35 125,70 C125,90 100,90 100,110" 
-                                fill="none" 
-                                stroke="#FF7082" 
-                                stroke-width="6" 
-                                stroke-linecap="round"
-                                opacity="0.6"
-                            />
-                        </g>
+            <!-- ÁREA 2: Card Central -->
+            <div class="card-area">
+                <div id="card" class="bg-white border-4 border-yellow-300 rounded-[2rem] shadow-lg retro-shadow transition-all group relative">
+                    
+                    <!-- Ícone Interrogação (ESQUERDA) -->
+                    <div class="absolute top-2 left-4 w-[10vmin] h-[10vmin] z-20 pointer-events-none">
+                        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
+                             <path d="M85,130 C85,130 90,135 100,135 C110,135 115,130 115,130" stroke="#e5e7eb" stroke-width="8" stroke-linecap="round" transform="translate(4,4)" />
+                            <g class="animate-swing">
+                                <path d="M100,160 L100,120" stroke="#FF9EAA" stroke-width="25" stroke-linecap="round" />
+                                <circle cx="100" cy="180" r="14" fill="#2DD4BF" stroke="#fff" stroke-width="4" />
+                                <path d="M65,70 C65,20 135,20 135,70 C135,100 100,100 100,125" fill="none" stroke="#FF9EAA" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M75,70 C75,35 125,35 125,70 C125,90 100,90 100,110" fill="none" stroke="#FF7082" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+                            </g>
+                            <text x="140" y="50" font-size="40" fill="#2DD4BF" class="animate-pulse-soft">✨</text>
+                        </svg>
+                    </div>
 
-                        <!-- Estrelinhas decorativas -->
-                        <text x="140" y="50" font-size="40" fill="#2DD4BF" class="animate-pulse-soft">✨</text>
-                        <text x="30" y="100" font-size="25" fill="#FDE047" class="animate-pulse-soft" style="animation-delay: 0.5s">✦</text>
-                    </svg>
+                    <!-- Badge Categoria (DIREITA) -->
+                    <div id="category-badge" class="absolute top-4 right-4 bg-teal-100 text-teal-600 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide hidden retro-font shadow-sm z-20">
+                        Categoria
+                    </div>
+
+                    <!-- Conteúdo Central -->
+                    <div id="result-content" class="text-center w-full z-10 flex flex-col items-center justify-center h-full px-6 py-4">
+                        <span id="placeholder-icon" class="text-[8vmin] mb-2 block animate-float">🎲</span>
+                        <h2 id="result-text" class="text-gray-700 retro-font break-words w-full" style="font-size: 6vmin;">
+                            Vamos Jogar?
+                        </h2>
+                    </div>
+
+                    <!-- Decorações Internas -->
+                    <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-pink-50 rounded-full mix-blend-multiply opacity-50 pointer-events-none overflow-hidden"></div>
                 </div>
-
-                <!-- Badge Categoria (AGORA NA DIREITA: right-4) -->
-                <div id="category-badge" class="absolute top-4 right-4 bg-teal-100 text-teal-600 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide hidden retro-font shadow-sm z-20">
-                    Categoria
-                </div>
-
-                <!-- Conteúdo Central -->
-                <div id="result-content" class="text-center w-full z-10 flex flex-col items-center justify-center h-full px-8 mt-2">
-                    <span id="placeholder-icon" class="text-[8vmin] mb-2 block animate-float">🎲</span>
-                    <h2 id="result-text" class="card-text text-gray-700 leading-tight retro-font break-words w-full px-4">
-                        Vamos Jogar?
-                    </h2>
-                </div>
-
-                <!-- Decorações Internas Sutis (Fundo do Card) -->
-                <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-pink-50 rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
-                <div class="absolute -top-8 -right-8 w-20 h-20 bg-teal-50 rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
             </div>
 
-            <!-- Botão -->
-            <button onclick="sortear()" class="w-full max-w-[40%] bg-teal-400 hover:bg-teal-300 active:bg-teal-500 text-white btn-text py-3 md:py-4 rounded-full font-bold retro-shadow retro-shadow-active transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 retro-font tracking-wide z-20">
-                <span>INICIAR</span>
-            </button>
+            <!-- ÁREA 3: Botão -->
+            <div class="button-area">
+                <button onclick="sortear()" class="w-full max-w-[40%] bg-teal-400 hover:bg-teal-300 active:bg-teal-500 text-white btn-text py-[2vmin] rounded-full font-bold retro-shadow retro-shadow-active transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 retro-font tracking-wide z-20 shadow-md">
+                    <span id="btn-label">INICIAR</span>
+                </button>
+            </div>
 
         </div>
     </div>
 
     <script>
+        // --- SCREEN WAKE LOCK ---
+        let wakeLock = null;
+        const requestWakeLock = async () => {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => console.log('Wake Lock released'));
+                }
+            } catch (err) { console.error(err); }
+        };
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock();
+        });
+
+        // --- BANCO DE DADOS (Mantido igual) ---
         const database = [
-            // --- DESENHOS ANIMADOS & PERSONAGENS (NOVO) ---
+            // --- DESENHOS ANIMADOS & PERSONAGENS ---
             { name: "Pica-Pau", category: "Desenho" },
             { name: "Scooby-Doo", category: "Desenho" },
             { name: "Salsicha", category: "Desenho" },
@@ -420,10 +460,18 @@
         ];
 
         function sortear() {
+            if (!wakeLock) requestWakeLock();
+
             const resultText = document.getElementById('result-text');
             const placeholderIcon = document.getElementById('placeholder-icon');
             const badge = document.getElementById('category-badge');
             const card = document.getElementById('card');
+            const btnLabel = document.getElementById('btn-label');
+
+            // Muda o texto do botão para "REINICIAR" (ou "PRÓXIMO" conforme fluxo do jogo)
+            if (btnLabel.textContent === "INICIAR") {
+                btnLabel.textContent = "PRÓXIMO";
+            }
 
             resultText.classList.remove('animate-pop');
             void resultText.offsetWidth;
@@ -435,9 +483,9 @@
             resultText.textContent = selected.name;
             resultText.classList.add('animate-pop');
             
-            // Ajuste dinâmico melhorado usando vmin
+            // Ajuste dinâmico de fonte (agora mais seguro com clamp no CSS como base)
             if (selected.name.length > 20) {
-                resultText.style.fontSize = '4vmin';
+                resultText.style.fontSize = '4.5vmin';
             } else if (selected.name.length > 12) {
                 resultText.style.fontSize = '5.5vmin';
             } else {
@@ -447,7 +495,6 @@
             const colors = ['bg-yellow-100 text-yellow-700', 'bg-red-100 text-red-700', 'bg-teal-100 text-teal-700', 'bg-blue-100 text-blue-700', 'bg-pink-100 text-pink-700', 'bg-purple-100 text-purple-700', 'bg-orange-100 text-orange-700'];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
-            // AGORA NA DIREITA: right-4
             badge.className = `absolute top-4 right-4 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide animate-pop retro-font ${randomColor} shadow-sm z-20`;
             badge.textContent = selected.category;
             badge.style.display = 'block';
