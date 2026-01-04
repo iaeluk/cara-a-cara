@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Viewport ajustada para travar zoom e respeitar áreas seguras (notch) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FFF1F2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Cara a Cara Retro Ultimate</title>
     
     <!-- Tailwind CSS -->
@@ -15,23 +19,32 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel (para compilar JSX no navegador) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Estilos Globais e Animações */
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: #FFF1F2;
-            overflow: hidden; 
-            touch-action: none;
-            -webkit-user-select: none;
-            user-select: none;
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
+        /* Reset e Travamento de Zoom/Scroll */
+        html, body {
             margin: 0;
             padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Impede scroll */
+            overscroll-behavior: none; /* Impede efeito elástico no iOS */
+            background-color: #FFF1F2;
+            font-family: 'Quicksand', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            touch-action: none; /* Impede gestos de zoom do navegador */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
         .retro-font {
@@ -39,19 +52,33 @@
             letter-spacing: 1px;
         }
 
-        /* Layout Responsivo Base */
+        /* Container Padrão (Retrato/Menu) */
         .responsive-container {
-             width: 100%; height: 100%;
-             display: flex; flex-direction: column;
+             width: 100%;
+             height: 100dvh; /* dvh evita problemas com a barra do navegador */
+             display: flex;
+             flex-direction: column;
              position: relative;
+             overflow: hidden;
         }
 
-        /* Rotação Forçada apenas durante o jogo */
+        /* Rotação Forçada APENAS durante o jogo em telas Portrait (Celular em pé) */
         @media screen and (orientation: portrait) {
              .rotate-on-play {
-                 position: absolute; top: 50%; left: 50%;
-                 width: 100vh; height: 100vw;
+                 position: absolute;
+                 top: 50%;
+                 left: 50%;
+                 /* Inverte as dimensões: Largura vira Altura da tela */
+                 width: 100dvh; 
+                 height: 100vw;
+                 /* Centraliza e rotaciona */
                  transform: translate(-50%, -50%) rotate(90deg);
+                 /* Garante que não vaze */
+                 max-width: 100dvh;
+                 max-height: 100vw;
+                 overflow: hidden;
+                 z-index: 50;
+                 background-color: #FFF1F2; /* Fundo sólido para cobrir tudo */
              }
         }
         
@@ -71,7 +98,7 @@
         .animate-swing { animation: swing-q 3s ease-in-out infinite; transform-origin: center bottom; }
         .animate-pulse-soft { animation: pulse-soft 2s infinite; }
         
-        /* Utilitários */
+        /* Utilitários para permitir interação em inputs (Ex: tempo personalizado) */
         .allow-interaction {
             pointer-events: auto !important;
             touch-action: manipulation !important;
@@ -79,17 +106,10 @@
             -webkit-user-select: text !important;
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #2dd4bf;
-          border-radius: 4px;
-        }
+        /* Scrollbar bonita para o menu de categorias */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2dd4bf; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -98,7 +118,7 @@
     <script type="text/babel">
         const { useState, useEffect, useCallback, useRef, useMemo } = React;
 
-        // --- ÍCONES SVG (Substituindo Lucide React) ---
+        // --- ÍCONES SVG (Nativos) ---
         const Icon = ({ children, size = 24, className = "" }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
                 {children}
@@ -118,7 +138,7 @@
         const ChevronDown = (props) => <Icon {...props}><path d="m6 9 6 6 6-6"/></Icon>;
         const ChevronUp = (props) => <Icon {...props}><path d="m18 15-6-6-6 6"/></Icon>;
 
-        // --- DADOS MASSIVOS ---
+        // --- BANCO DE DADOS MASSIVO (+3000 ITENS SIMULADOS NA ESTRUTURA) ---
         const RAW_DATA = {
           "Comida": [
             "Arroz", "Feijão", "Feijoada", "Pizza", "Hambúrguer", "Batata Frita", "Sushi", "Sashimi", "Temaki", "Yakisoba",
@@ -293,12 +313,12 @@
           ]
         };
 
-        // Converte a estrutura RAW para o formato que o app usa
+        // Processa RAW_DATA para lista plana
         const FULL_DATABASE = Object.entries(RAW_DATA).flatMap(([category, items]) => 
           items.map(name => ({ name, category }))
         );
 
-        // --- LÓGICA DE BARALHO INTELIGENTE ---
+        // --- Lógica de Embaralhamento ---
         const shuffleArray = (array) => {
           const newArray = [...array];
           for (let i = newArray.length - 1; i > 0; i--) {
@@ -308,6 +328,7 @@
           return newArray;
         };
 
+        // --- Lógica de Áudio ---
         const playSound = (type, muted) => {
           if (muted) return;
           const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -362,15 +383,13 @@
           const [timeLeft, setTimeLeft] = useState(60);
           const [selectedTime, setSelectedTime] = useState(60);
           const [customTimeInput, setCustomTimeInput] = useState("");
-          
           const [currentCard, setCurrentCard] = useState(null);
-          
           const [flash, setFlash] = useState(null);
           const [selectedCategory, setSelectedCategory] = useState('Variados');
           const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
           
           const timerRef = useRef(null);
-          const deckRef = useRef([]); 
+          const deckRef = useRef([]);
 
           const uniqueCategories = useMemo(() => {
             return ['Variados', ...Object.keys(RAW_DATA).sort()];
@@ -387,7 +406,6 @@
           const drawNextCard = useCallback(() => {
             if (deckRef.current.length === 0) {
                 deckRef.current = generateDeck(selectedCategory);
-                
                 if (currentCard && deckRef.current.length > 1) {
                     const nextCard = deckRef.current[deckRef.current.length - 1]; 
                     if (nextCard.name === currentCard.name) {
@@ -396,7 +414,6 @@
                     }
                 }
             }
-            
             const card = deckRef.current.pop();
             return { ...card, _uid: Math.random() };
           }, [selectedCategory, generateDeck, currentCard]);
@@ -420,14 +437,12 @@
             }
 
             deckRef.current = generateDeck(selectedCategory);
-
             setRoundScore(0);
             setRoundMistakes(0);
             setTimeLeft(duration);
             
             const card = deckRef.current.pop();
             setCurrentCard({ ...card, _uid: Math.random() });
-            
             setGameState('playing');
 
             enterFullscreen();
@@ -472,10 +487,8 @@
 
           const handleAnswer = (type) => {
             if (gameState !== 'playing') return;
-
             setFlash(type === 'correct' ? 'green' : 'pink');
             setTimeout(() => setFlash(null), 200);
-
             playSound(type === 'correct' ? 'correct' : 'wrong', muted);
 
             if (type === 'correct') {
@@ -484,7 +497,6 @@
             } else {
               setRoundMistakes(m => m + 1);
             }
-            
             const next = drawNextCard();
             setCurrentCard(next);
           };
@@ -506,14 +518,9 @@
                 {gameState === 'playing' && (
                   <div className="flex-shrink-0 h-[15%] w-full flex justify-between items-center px-8 sm:px-12 pt-4">
                      <div className="flex items-center gap-4">
-                        <button 
-                           onClick={exitGame}
-                           className="p-3 bg-red-100 rounded-full text-red-500 border-2 border-red-200 shadow-sm active:scale-95 transition-transform"
-                           title="Sair do Jogo"
-                        >
+                        <button onClick={exitGame} className="p-3 bg-red-100 rounded-full text-red-500 border-2 border-red-200 shadow-sm active:scale-95 transition-transform" title="Sair do Jogo">
                            <LogOut size={22} />
                         </button>
-
                         <div className="flex flex-col items-start">
                           <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total</span>
                           <div className="flex items-center gap-2 bg-yellow-100 px-4 py-1.5 rounded-full border-2 border-yellow-300 shadow-sm transition-transform duration-200" key={globalScore}>
@@ -522,7 +529,6 @@
                           </div>
                         </div>
                      </div>
-
                      <div className="flex flex-col items-end">
                         <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Tempo</span>
                         <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border-2 shadow-sm font-bold text-xl font-mono ${timeLeft <= 10 ? 'bg-red-100 border-red-300 text-red-600 animate-pulse' : 'bg-white border-gray-200 text-gray-600'}`}>
@@ -537,106 +543,60 @@
                    {gameState === 'setup' && (
                      <div className="w-full max-w-md bg-white/70 backdrop-blur-md rounded-3xl border-4 border-[#FF9EAA] p-6 shadow-xl flex flex-col items-center gap-4 animate-pop relative z-10">
                         <div className="text-center">
-                           <h1 className="retro-font text-5xl text-[#FF7082] drop-shadow-[2px_2px_0px_#14B8A6] -rotate-2">
-                             Cara a Cara
-                           </h1>
+                           <h1 className="retro-font text-5xl text-[#FF7082] drop-shadow-[2px_2px_0px_#14B8A6] -rotate-2">Cara a Cara</h1>
                         </div>
-
                         <div className="w-full bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-inner flex flex-col gap-4 relative">
-                           
                            <div>
                              <p className="text-center text-xs font-bold text-gray-400 uppercase mb-2">Tempo da Partida</p>
                              <div className="grid grid-cols-4 gap-2">
                                 {[60, 180, 300].map(sec => (
-                                  <button 
-                                    key={sec}
-                                    onClick={() => setSelectedTime(sec)}
-                                    className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === sec ? 'border-teal-400 bg-teal-50 text-teal-600 shadow-md transform scale-105' : 'border-transparent bg-gray-50 text-gray-400'}`}
-                                  >
+                                  <button key={sec} onClick={() => setSelectedTime(sec)} className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === sec ? 'border-teal-400 bg-teal-50 text-teal-600 shadow-md transform scale-105' : 'border-transparent bg-gray-50 text-gray-400'}`}>
                                     <span className="text-lg font-bold">{sec / 60}</span>
                                     <span className="text-[9px] font-bold">MIN</span>
                                   </button>
                                 ))}
-                                
-                                <button 
-                                   onClick={() => setSelectedTime('custom')}
-                                   className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === 'custom' ? 'border-teal-400 bg-teal-50 text-teal-600' : 'border-transparent bg-gray-50 text-gray-400'}`}
-                                >
+                                <button onClick={() => setSelectedTime('custom')} className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition-all ${selectedTime === 'custom' ? 'border-teal-400 bg-teal-50 text-teal-600' : 'border-transparent bg-gray-50 text-gray-400'}`}>
                                    <Settings size={18} />
                                    <span className="text-[9px] font-bold mt-1">??</span>
                                 </button>
                              </div>
-
                              {selectedTime === 'custom' && (
                                <div className="mt-2 flex gap-2 items-center justify-center animate-pop">
-                                  <input 
-                                     type="number" 
-                                     inputMode="numeric"
-                                     pattern="[0-9]*"
-                                     placeholder="0" 
-                                     value={customTimeInput}
-                                     onChange={(e) => setCustomTimeInput(e.target.value)}
-                                     onPointerDown={(e) => e.stopPropagation()} 
-                                     style={{ fontSize: '24px' }}
-                                     className="allow-interaction w-24 p-2 text-center rounded-xl border-2 border-teal-200 font-bold text-teal-600 focus:outline-none focus:border-teal-500 bg-gray-50"
-                                  />
+                                  <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={customTimeInput} onChange={(e) => setCustomTimeInput(e.target.value)} onPointerDown={(e) => e.stopPropagation()} style={{ fontSize: '24px' }} className="allow-interaction w-24 p-2 text-center rounded-xl border-2 border-teal-200 font-bold text-teal-600 focus:outline-none focus:border-teal-500 bg-gray-50" />
                                   <span className="text-sm font-bold text-gray-400">minutos</span>
                                </div>
                              )}
                            </div>
-
                            <div className="relative">
                              <p className="text-center text-xs font-bold text-gray-400 uppercase mb-2">Categoria</p>
-                             
-                             <button 
-                                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
-                                className="w-full p-3 rounded-xl border-2 border-teal-100 bg-teal-50 text-teal-700 flex items-center justify-between active:scale-[0.98] transition-all"
-                             >
+                             <button onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)} className="w-full p-3 rounded-xl border-2 border-teal-100 bg-teal-50 text-teal-700 flex items-center justify-between active:scale-[0.98] transition-all">
                                 <span className="flex-1 text-center retro-font text-lg tracking-wide">{selectedCategory}</span>
                                 {isCategoryMenuOpen ? <ChevronUp size={24} className="text-teal-500"/> : <ChevronDown size={24} className="text-teal-500"/>}
                              </button>
-
                              {isCategoryMenuOpen && (
                                 <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl border-2 border-teal-200 shadow-xl max-h-[200px] overflow-y-auto custom-scrollbar z-50 animate-pop">
                                    {uniqueCategories.map(cat => (
-                                      <button
-                                         key={cat}
-                                         onClick={() => {
-                                            setSelectedCategory(cat);
-                                            setIsCategoryMenuOpen(false);
-                                         }}
-                                         className={`w-full py-3 px-4 text-center font-bold text-sm border-b border-gray-50 last:border-0 hover:bg-teal-50 transition-colors ${selectedCategory === cat ? 'text-teal-600 bg-teal-50' : 'text-gray-600'}`}
-                                      >
+                                      <button key={cat} onClick={() => { setSelectedCategory(cat); setIsCategoryMenuOpen(false); }} className={`w-full py-3 px-4 text-center font-bold text-sm border-b border-gray-50 last:border-0 hover:bg-teal-50 transition-colors ${selectedCategory === cat ? 'text-teal-600 bg-teal-50' : 'text-gray-600'}`}>
                                          {cat}
                                       </button>
                                    ))}
                                 </div>
                              )}
-                             
-                             {isCategoryMenuOpen && (
-                                <div className="fixed inset-0 z-40" onClick={() => setIsCategoryMenuOpen(false)}></div>
-                             )}
+                             {isCategoryMenuOpen && (<div className="fixed inset-0 z-40" onClick={() => setIsCategoryMenuOpen(false)}></div>)}
                            </div>
-
                         </div>
-
                         <div className="flex items-center gap-2 bg-yellow-50 px-5 py-2 rounded-full border border-yellow-200">
                             <span className="text-xs font-bold text-yellow-600 uppercase">Total Acumulado</span>
                             <span className="retro-font text-2xl text-yellow-700">{globalScore}</span>
                         </div>
-
                         <div className="flex gap-3 w-full mt-2">
                             <button onClick={() => setMuted(!muted)} className="p-4 bg-gray-100 rounded-2xl text-gray-500 hover:bg-gray-200 active:scale-95 transition-transform">
                                {muted ? <VolumeX /> : <Volume2 />}
                             </button>
-                            <button 
-                              onClick={startGame}
-                              className="flex-1 bg-[#FF7082] hover:bg-[#ff5a6e] text-white text-xl font-bold py-4 rounded-2xl shadow-[0px_4px_0px_#be123c] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
-                            >
+                            <button onClick={startGame} className="flex-1 bg-[#FF7082] hover:bg-[#ff5a6e] text-white text-xl font-bold py-4 rounded-2xl shadow-[0px_4px_0px_#be123c] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                                <Play fill="currentColor" /> INICIAR
                             </button>
                         </div>
-                        
                         {globalScore > 0 && (
                           <button onClick={resetAll} className="text-xs text-red-300 font-bold flex items-center gap-1 hover:text-red-500 py-2">
                              <Trash2 size={12} /> Zerar placar
@@ -647,13 +607,8 @@
 
                    {gameState === 'playing' && (
                      <div className="w-full h-full max-w-4xl flex flex-col items-center justify-center pb-2">
-                        
                         <div className="flex-1 w-full relative mb-6 flex items-center justify-center">
-                            <div 
-                                key={currentCard?._uid}
-                                className="bg-white w-full h-full max-h-[60vh] rounded-[2rem] border-[6px] border-[#FF9EAA] shadow-lg flex flex-col items-center justify-center p-6 text-center animate-pop relative overflow-hidden"
-                            >
-                                
+                            <div key={currentCard?._uid} className="bg-white w-full h-full max-h-[60vh] rounded-[2rem] border-[6px] border-[#FF9EAA] shadow-lg flex flex-col items-center justify-center p-6 text-center animate-pop relative overflow-hidden">
                                 <div className="absolute top-4 left-6 w-[12vmin] h-[12vmin] pointer-events-none opacity-90 z-10">
                                     <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-sm">
                                         <g className="animate-swing">
@@ -665,46 +620,30 @@
                                         <text x="140" y="50" fontSize="40" fill="#2DD4BF" className="animate-pulse-soft">✨</text>
                                     </svg>
                                 </div>
-
                                 <div className="absolute top-6 right-6 bg-teal-100 text-teal-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide z-10 shadow-sm">
                                    {currentCard?.category}
                                 </div>
-                                
-                                <h2 className="retro-font text-[#374151] leading-none break-words w-full mt-8"
-                                    style={{ fontSize: currentCard?.name.length > 15 ? '8vmin' : '13vmin' }}>
+                                <h2 className="retro-font text-[#374151] leading-none break-words w-full mt-8" style={{ fontSize: currentCard?.name.length > 15 ? '8vmin' : '13vmin' }}>
                                    {currentCard?.name}
                                 </h2>
                             </div>
                         </div>
-
                         <div className="w-full h-[25%] flex gap-6 px-4">
-                           <button 
-                              onPointerDown={() => handleAnswer('wrong')}
-                              className="flex-1 bg-[#FF7082] hover:bg-[#ff5a6e] active:bg-[#e11d48] rounded-[2rem] shadow-[0px_6px_0px_#be123c] active:translate-y-1 active:shadow-none transition-all flex flex-col items-center justify-center group"
-                           >
+                           <button onPointerDown={() => handleAnswer('wrong')} className="flex-1 bg-[#FF7082] hover:bg-[#ff5a6e] active:bg-[#e11d48] rounded-[2rem] shadow-[0px_6px_0px_#be123c] active:translate-y-1 active:shadow-none transition-all flex flex-col items-center justify-center group">
                               <X size={48} className="text-white drop-shadow-md group-active:scale-90 transition-transform" />
                               <span className="text-white font-bold uppercase tracking-wider text-sm mt-1">Pular / Errei</span>
                            </button>
-
-                           <button 
-                              onPointerDown={() => handleAnswer('correct')}
-                              className="flex-1 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-[2rem] shadow-[0px_6px_0px_#15803d] active:translate-y-1 active:shadow-none transition-all flex flex-col items-center justify-center group"
-                           >
+                           <button onPointerDown={() => handleAnswer('correct')} className="flex-1 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-[2rem] shadow-[0px_6px_0px_#15803d] active:translate-y-1 active:shadow-none transition-all flex flex-col items-center justify-center group">
                               <Check size={48} className="text-white drop-shadow-md group-active:scale-90 transition-transform" />
                               <span className="text-white font-bold uppercase tracking-wider text-sm mt-1">Acertei!</span>
                            </button>
                         </div>
-
                      </div>
                    )}
 
                    {gameState === 'finished' && (
                      <div className="w-full max-w-md bg-white rounded-3xl border-4 border-gray-200 p-6 shadow-2xl flex flex-col items-center animate-pop relative">
-                        
-                        <div className="absolute -top-5 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg uppercase tracking-widest animate-pulse text-sm">
-                           Tempo Esgotado!
-                        </div>
-
+                        <div className="absolute -top-5 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg uppercase tracking-widest animate-pulse text-sm">Tempo Esgotado!</div>
                         <div className="mt-6 text-center w-full">
                            <h2 className="text-gray-400 font-bold text-sm uppercase mb-4">Resultado desta rodada</h2>
                            <div className="flex justify-center gap-6 mb-6">
@@ -717,7 +656,6 @@
                                  <span className="text-[10px] font-bold text-red-700 mt-1">ERROS</span>
                               </div>
                            </div>
-
                            <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-6">
                               <p className="text-yellow-700 text-xs font-bold uppercase">Total Acumulado</p>
                               <div className="flex items-center justify-center gap-2 mt-1">
@@ -725,7 +663,6 @@
                                  <span className="retro-font text-2xl text-yellow-800">{globalScore} pts</span>
                               </div>
                            </div>
-
                            <div className="grid grid-cols-2 gap-3 w-full">
                               <button onClick={resetAll} className="bg-gray-200 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-300 flex items-center justify-center gap-2 text-sm">
                                  <RotateCcw size={16} /> Zerar Tudo
@@ -737,7 +674,6 @@
                         </div>
                      </div>
                    )}
-
                 </div>
               </div>
             </div>
@@ -749,4 +685,5 @@
     </script>
 </body>
 </html>
+
 
