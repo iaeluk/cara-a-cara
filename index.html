@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cara a Cara Retro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Shrikhand&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-coral: #FF9EAA;
+            --color-coral-dark: #FF7082;
+            --color-seafoam: #2DD4BF;
+            --color-seafoam-dark: #14B8A6;
+            --color-lemon: #FEF08A;
+            --color-lemon-dark: #FDE047;
+            --color-text: #374151;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #FFF1F2;
+            overflow: hidden; 
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, .retro-font {
+            font-family: 'Shrikhand', cursive;
+            letter-spacing: 1px;
+        }
+
+        .retro-shadow { box-shadow: 4px 4px 0px #14B8A6; }
+        .retro-shadow-active:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #14B8A6; }
+        .retro-shadow-text { text-shadow: 2px 2px 0px #2DD4BF; }
+        .retro-shadow-text-pink { text-shadow: 2px 2px 0px #FF9EAA; }
+
+        /* Animações */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes swing-q {
+            0% { transform: rotate(-8deg); }
+            50% { transform: rotate(8deg); }
+            100% { transform: rotate(-8deg); }
+        }
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .animate-swing { animation: swing-q 3s ease-in-out infinite; transform-origin: center bottom; }
+        .animate-pulse-soft { animation: pulse-soft 2s infinite; }
+
+        /* --- LÓGICA DE ROTAÇÃO E LAYOUT --- */
+        #orientation-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+        }
+
+        @media screen and (orientation: portrait) {
+            #orientation-wrapper {
+                width: 100vh;
+                height: 100vw;
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            max-width: 900px;
+            padding: 1rem;
+        }
+
+        /* Unidades vmin garantem escala perfeita independente da orientação */
+        .title-text { font-size: 8vmin; }
+        .card-text { font-size: 6.5vmin; }
+        .btn-text { font-size: 4vmin; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-yellow-50">
+
+    <!-- Fundo Decorativo -->
+    <div class="absolute top-[-10%] right-[-10%] w-[50vmin] h-[50vmin] bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[60vmin] h-[60vmin] bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-float" style="animation-delay: 2s"></div>
+
+    <!-- Wrapper de Orientação -->
+    <div id="orientation-wrapper">
+        <div class="game-container">
+            
+            <!-- Título -->
+            <h1 class="title-text text-coral-500 mb-4 retro-shadow-text text-[#FF9EAA] rotate-[-2deg] whitespace-nowrap">
+                Cara a Cara
+            </h1>
+            
+            <!-- Card Principal -->
+            <div id="card" class="relative bg-white border-4 border-yellow-300 w-full max-w-[85%] aspect-[16/7] rounded-[2rem] flex flex-col items-center justify-center p-4 mb-6 retro-shadow transition-all group shadow-lg">
+                
+                <!-- Ícone Interrogação Bonito (AGORA NA ESQUERDA: left-4) -->
+                <div class="absolute top-2 left-4 w-[12vmin] h-[12vmin] z-20 pointer-events-none">
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
+                         <!-- Sombra da interrogação -->
+                         <path d="M85,130 C85,130 90,135 100,135 C110,135 115,130 115,130" stroke="#e5e7eb" stroke-width="8" stroke-linecap="round" transform="translate(4,4)" />
+                        
+                        <!-- Corpo da Interrogação Animada -->
+                        <g class="animate-swing">
+                            <!-- Haste -->
+                            <path d="M100,160 L100,120" stroke="#FF9EAA" stroke-width="25" stroke-linecap="round" />
+                            <!-- Ponto -->
+                            <circle cx="100" cy="180" r="14" fill="#2DD4BF" stroke="#fff" stroke-width="4" />
+                            
+                            <!-- Curva superior -->
+                            <path d="M65,70 C65,20 135,20 135,70 C135,100 100,100 100,125" 
+                                fill="none" 
+                                stroke="#FF9EAA" 
+                                stroke-width="25" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                            />
+                            
+                            <!-- Brilho interno -->
+                            <path d="M75,70 C75,35 125,35 125,70 C125,90 100,90 100,110" 
+                                fill="none" 
+                                stroke="#FF7082" 
+                                stroke-width="6" 
+                                stroke-linecap="round"
+                                opacity="0.6"
+                            />
+                        </g>
+
+                        <!-- Estrelinhas decorativas -->
+                        <text x="140" y="50" font-size="40" fill="#2DD4BF" class="animate-pulse-soft">✨</text>
+                        <text x="30" y="100" font-size="25" fill="#FDE047" class="animate-pulse-soft" style="animation-delay: 0.5s">✦</text>
+                    </svg>
+                </div>
+
+                <!-- Badge Categoria (AGORA NA DIREITA: right-4) -->
+                <div id="category-badge" class="absolute top-4 right-4 bg-teal-100 text-teal-600 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide hidden retro-font shadow-sm z-20">
+                    Categoria
+                </div>
+
+                <!-- Conteúdo Central -->
+                <div id="result-content" class="text-center w-full z-10 flex flex-col items-center justify-center h-full px-8 mt-2">
+                    <span id="placeholder-icon" class="text-[8vmin] mb-2 block animate-float">🎲</span>
+                    <h2 id="result-text" class="card-text text-gray-700 leading-tight retro-font break-words w-full px-4">
+                        Vamos Jogar?
+                    </h2>
+                </div>
+
+                <!-- Decorações Internas Sutis (Fundo do Card) -->
+                <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-pink-50 rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
+                <div class="absolute -top-8 -right-8 w-20 h-20 bg-teal-50 rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
+            </div>
+
+            <!-- Botão -->
+            <button onclick="sortear()" class="w-full max-w-[40%] bg-teal-400 hover:bg-teal-300 active:bg-teal-500 text-white btn-text py-3 md:py-4 rounded-full font-bold retro-shadow retro-shadow-active transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 retro-font tracking-wide z-20">
+                <span>INICIAR</span>
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        const database = [
+            // --- DESENHOS ANIMADOS & PERSONAGENS (NOVO) ---
+            { name: "Pica-Pau", category: "Desenho" },
+            { name: "Scooby-Doo", category: "Desenho" },
+            { name: "Salsicha", category: "Desenho" },
+            { name: "Tom", category: "Tom & Jerry" },
+            { name: "Jerry", category: "Tom & Jerry" },
+            { name: "Pernalonga", category: "Looney Tunes" },
+            { name: "Patolino", category: "Looney Tunes" },
+            { name: "Piu-Piu", category: "Looney Tunes" },
+            { name: "Frajola", category: "Looney Tunes" },
+            { name: "Taz", category: "Looney Tunes" },
+            { name: "Fred Flintstone", category: "Hanna-Barbera" },
+            { name: "Barney", category: "Hanna-Barbera" },
+            { name: "George Jetson", category: "Hanna-Barbera" },
+            { name: "Mickey Mouse", category: "Disney" },
+            { name: "Minnie Mouse", category: "Disney" },
+            { name: "Pato Donald", category: "Disney" },
+            { name: "Pateta", category: "Disney" },
+            { name: "Pluto", category: "Disney" },
+            { name: "Cinderela", category: "Princesa" },
+            { name: "Branca de Neve", category: "Princesa" },
+            { name: "Ariel", category: "Princesa" },
+            { name: "Elsa", category: "Frozen" },
+            { name: "Olaf", category: "Frozen" },
+            { name: "Simba", category: "Rei Leão" },
+            { name: "Timão", category: "Rei Leão" },
+            { name: "Pumba", category: "Rei Leão" },
+            { name: "Woody", category: "Toy Story" },
+            { name: "Buzz Lightyear", category: "Toy Story" },
+            { name: "Shrek", category: "Dreamworks" },
+            { name: "Burro", category: "Dreamworks" },
+            { name: "Fiona", category: "Dreamworks" },
+            { name: "Po (Kung Fu Panda)", category: "Dreamworks" },
+            { name: "Bob Esponja", category: "Nickelodeon" },
+            { name: "Patrick Estrela", category: "Nickelodeon" },
+            { name: "Lula Molusco", category: "Nickelodeon" },
+            { name: "Timmy Turner", category: "Padrinhos Mágicos" },
+            { name: "Jimmy Neutron", category: "Nickelodeon" },
+            { name: "Naruto", category: "Anime" },
+            { name: "Goku", category: "Anime" },
+            { name: "Vegeta", category: "Anime" },
+            { name: "Pikachu", category: "Pokémon" },
+            { name: "Ash Ketchum", category: "Pokémon" },
+            { name: "Mônica", category: "Turma da Mônica" },
+            { name: "Cebolinha", category: "Turma da Mônica" },
+            { name: "Cascão", category: "Turma da Mônica" },
+            { name: "Magali", category: "Turma da Mônica" },
+            { name: "Chico Bento", category: "Turma da Mônica" },
+            { name: "Garfield", category: "Tirinhas" },
+            { name: "Snoopy", category: "Tirinhas" },
+            { name: "Charlie Brown", category: "Tirinhas" },
+            { name: "Popeye", category: "Clássico" },
+            { name: "Olívia Palito", category: "Clássico" },
+            { name: "Pantera Cor-de-Rosa", category: "Clássico" },
+            { name: "Homer Simpson", category: "Simpsons" },
+            { name: "Bart Simpson", category: "Simpsons" },
+            { name: "Lisa Simpson", category: "Simpsons" },
+            { name: "Marge Simpson", category: "Simpsons" },
+            { name: "Ben 10", category: "Cartoon Network" },
+            { name: "As Meninas Superpoderosas", category: "Cartoon Network" },
+            { name: "Johnny Bravo", category: "Cartoon Network" },
+
+            // --- CANTORES / ARTISTAS ---
+            { name: "Anitta", category: "Cantora" },
+            { name: "Roberto Carlos", category: "Cantor" },
+            { name: "Ivete Sangalo", category: "Cantora" },
+            { name: "Caetano Veloso", category: "Cantor" },
+            { name: "Marília Mendonça", category: "Cantora" },
+            { name: "Seu Jorge", category: "Cantor" },
+            { name: "Gusttavo Lima", category: "Cantor" },
+            { name: "Ludmilla", category: "Cantora" },
+            { name: "Zeca Pagodinho", category: "Cantor" },
+            { name: "Beyoncé", category: "Cantora" },
+            { name: "Michael Jackson", category: "Rei do Pop" },
+            { name: "Madonna", category: "Rainha do Pop" },
+            { name: "Freddie Mercury", category: "Cantor" },
+            { name: "Elvis Presley", category: "Cantor" },
+            { name: "Shakira", category: "Cantora" },
+            { name: "Taylor Swift", category: "Cantora" },
+            { name: "Justin Bieber", category: "Cantor" },
+            { name: "Lady Gaga", category: "Cantora" },
+            { name: "Adele", category: "Cantora" },
+            { name: "Bruno Mars", category: "Cantor" },
+            { name: "Rihanna", category: "Cantora" },
+            { name: "Gilberto Gil", category: "Cantor" },
+            { name: "Tim Maia", category: "Cantor" },
+
+            // --- ATORES / ATRIZES ---
+            { name: "Fernanda Montenegro", category: "Atriz" },
+            { name: "Wagner Moura", category: "Ator" },
+            { name: "Brad Pitt", category: "Ator" },
+            { name: "Angelina Jolie", category: "Atriz" },
+            { name: "Will Smith", category: "Ator" },
+            { name: "Leonardo DiCaprio", category: "Ator" },
+            { name: "Marilyn Monroe", category: "Ícone" },
+            { name: "Tom Cruise", category: "Ator" },
+            { name: "Dwayne 'The Rock'", category: "Ator" },
+            { name: "Paulo Gustavo", category: "Comediante" },
+            { name: "Tatá Werneck", category: "Comediante" },
+            { name: "Tony Ramos", category: "Ator" },
+            { name: "Susana Vieira", category: "Atriz" },
+            { name: "Johnny Depp", category: "Ator" },
+            { name: "Julia Roberts", category: "Atriz" },
+            { name: "Vin Diesel", category: "Ator" },
+
+            // --- APRESENTADORES BRASILEIROS ---
+            { name: "Silvio Santos", category: "Apresentador" },
+            { name: "Faustão", category: "Apresentador" },
+            { name: "Ana Maria Braga", category: "Apresentadora" },
+            { name: "Xuxa", category: "Rainha dos Baixinhos" },
+            { name: "Luciano Huck", category: "Apresentador" },
+            { name: "Galvão Bueno", category: "Narrador" },
+            { name: "Rodrigo Faro", category: "Apresentador" },
+            { name: "Eliana", category: "Apresentadora" },
+            { name: "Celso Portiolli", category: "Apresentador" },
+            { name: "Marcos Mion", category: "Apresentador" },
+            { name: "Serginho Groisman", category: "Apresentador" },
+            { name: "Pedro Bial", category: "Jornalista" },
+            { name: "William Bonner", category: "Jornalista" },
+            { name: "Fátima Bernardes", category: "Apresentadora" },
+            { name: "Ratinho", category: "Apresentador" },
+            { name: "Datena", category: "Apresentador" },
+            { name: "Sabrina Sato", category: "Apresentadora" },
+
+            // --- PERSONAGENS (GERAL) ---
+            { name: "Homem-Aranha", category: "Herói" },
+            { name: "Chaves", category: "Personagem" },
+            { name: "Harry Potter", category: "Bruxo" },
+            { name: "Batman", category: "Herói" },
+            { name: "Barbie", category: "Boneca" },
+            { name: "Darth Vader", category: "Vilão" },
+            { name: "Mulher Maravilha", category: "Heroína" },
+            { name: "Hulk", category: "Herói" },
+            { name: "Capitão América", category: "Herói" },
+            { name: "Homem de Ferro", category: "Herói" },
+            { name: "Coringa", category: "Vilão" },
+            { name: "Thor", category: "Herói" },
+            { name: "Viúva Negra", category: "Heroína" },
+
+            // --- ESPORTES ---
+            { name: "Pelé", category: "Rei do Futebol" },
+            { name: "Neymar Jr", category: "Jogador" },
+            { name: "Messi", category: "Jogador" },
+            { name: "Cristiano Ronaldo", category: "Jogador" },
+            { name: "Ayrton Senna", category: "Piloto" },
+            { name: "Serena Williams", category: "Tenista" },
+            { name: "Marta", category: "Jogadora" },
+            { name: "Usain Bolt", category: "Corredor" },
+            { name: "Ronaldo Fenômeno", category: "Jogador" },
+            { name: "Ronaldinho Gaúcho", category: "Jogador" },
+            { name: "Gabriel Medina", category: "Surfista" },
+            { name: "Michael Jordan", category: "Basquete" },
+            { name: "LeBron James", category: "Basquete" },
+
+            // --- COZINHA ---
+            { name: "Garfo", category: "Cozinha" },
+            { name: "Colher", category: "Cozinha" },
+            { name: "Faca", category: "Cozinha" },
+            { name: "Prato", category: "Cozinha" },
+            { name: "Copo de Vidro", category: "Cozinha" },
+            { name: "Panela de Pressão", category: "Cozinha" },
+            { name: "Frigideira", category: "Cozinha" },
+            { name: "Liquidificador", category: "Eletrodoméstico" },
+            { name: "Batedeira", category: "Eletrodoméstico" },
+            { name: "Fogão", category: "Eletrodoméstico" },
+            { name: "Geladeira", category: "Eletrodoméstico" },
+            { name: "Micro-ondas", category: "Eletrodoméstico" },
+            { name: "Pano de Prato", category: "Cozinha" },
+            { name: "Tábua de Carne", category: "Cozinha" },
+            { name: "Escumadeira", category: "Cozinha" },
+            { name: "Ralo de Pia", category: "Cozinha" },
+
+            // --- MÓVEIS / CASA ---
+            { name: "Sofá", category: "Móvel" },
+            { name: "Cama de Casal", category: "Móvel" },
+            { name: "Mesa de Jantar", category: "Móvel" },
+            { name: "Cadeira", category: "Móvel" },
+            { name: "Guarda-roupa", category: "Móvel" },
+            { name: "Armário", category: "Móvel" },
+            { name: "Poltrona", category: "Móvel" },
+            { name: "Abajur", category: "Decoração" },
+            { name: "Tapete", category: "Decoração" },
+            { name: "Cortina", category: "Decoração" },
+            { name: "Espelho", category: "Decoração" },
+            { name: "Vaso de Planta", category: "Decoração" },
+            { name: "Quadro", category: "Decoração" },
+            { name: "Televisão", category: "Eletrônico" },
+            { name: "Ventilador", category: "Eletrodoméstico" },
+            { name: "Ar Condicionado", category: "Eletrodoméstico" },
+
+            // --- BANHEIRO / HIGIENE ---
+            { name: "Escova de Dentes", category: "Banheiro" },
+            { name: "Pasta de Dente", category: "Banheiro" },
+            { name: "Sabonete", category: "Higiene" },
+            { name: "Shampoo", category: "Higiene" },
+            { name: "Condicionador", category: "Higiene" },
+            { name: "Toalha de Banho", category: "Banheiro" },
+            { name: "Papel Higiênico", category: "Banheiro" },
+            { name: "Vaso Sanitário", category: "Banheiro" },
+            { name: "Chuveiro", category: "Banheiro" },
+            { name: "Cotonete", category: "Higiene" },
+            { name: "Fio Dental", category: "Higiene" },
+            { name: "Pente", category: "Objeto" },
+            { name: "Secador de Cabelo", category: "Objeto" },
+
+            // --- OBJETOS DO DIA A DIA ---
+            { name: "Chave", category: "Objeto" },
+            { name: "Carteira", category: "Objeto" },
+            { name: "Óculos de Sol", category: "Acessório" },
+            { name: "Relógio de Pulso", category: "Acessório" },
+            { name: "Caneta Azul", category: "Objeto" },
+            { name: "Caderno", category: "Papelaria" },
+            { name: "Lápis", category: "Papelaria" },
+            { name: "Borracha", category: "Papelaria" },
+            { name: "Tesoura", category: "Objeto" },
+            { name: "Guarda-Chuva", category: "Objeto" },
+            { name: "Mochila", category: "Acessório" },
+            { name: "Celular", category: "Eletrônico" },
+            { name: "Carregador", category: "Eletrônico" },
+            { name: "Fone de Ouvido", category: "Eletrônico" },
+            { name: "Notebook", category: "Eletrônico" },
+            { name: "Garrafa de Água", category: "Objeto" },
+            { name: "Chinelo Havaianas", category: "Calçado" },
+            { name: "Tênis", category: "Calçado" },
+            { name: "Meia", category: "Roupa" },
+            { name: "Camiseta", category: "Roupa" },
+            { name: "Boné", category: "Acessório" },
+            { name: "Bola de Futebol", category: "Esporte" }
+        ];
+
+        function sortear() {
+            const resultText = document.getElementById('result-text');
+            const placeholderIcon = document.getElementById('placeholder-icon');
+            const badge = document.getElementById('category-badge');
+            const card = document.getElementById('card');
+
+            resultText.classList.remove('animate-pop');
+            void resultText.offsetWidth;
+
+            const randomIndex = Math.floor(Math.random() * database.length);
+            const selected = database[randomIndex];
+
+            placeholderIcon.style.display = 'none';
+            resultText.textContent = selected.name;
+            resultText.classList.add('animate-pop');
+            
+            // Ajuste dinâmico melhorado usando vmin
+            if (selected.name.length > 20) {
+                resultText.style.fontSize = '4vmin';
+            } else if (selected.name.length > 12) {
+                resultText.style.fontSize = '5.5vmin';
+            } else {
+                resultText.style.fontSize = '6.5vmin';
+            }
+            
+            const colors = ['bg-yellow-100 text-yellow-700', 'bg-red-100 text-red-700', 'bg-teal-100 text-teal-700', 'bg-blue-100 text-blue-700', 'bg-pink-100 text-pink-700', 'bg-purple-100 text-purple-700', 'bg-orange-100 text-orange-700'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // AGORA NA DIREITA: right-4
+            badge.className = `absolute top-4 right-4 px-3 py-1 rounded-full text-[2.5vmin] font-bold uppercase tracking-wide animate-pop retro-font ${randomColor} shadow-sm z-20`;
+            badge.textContent = selected.category;
+            badge.style.display = 'block';
+
+            const borders = ['border-yellow-300', 'border-teal-300', 'border-pink-300', 'border-blue-300', 'border-purple-300'];
+            card.classList.remove(...borders);
+            card.classList.add(borders[Math.floor(Math.random() * borders.length)]);
+        }
+    </script>
+</body>
+</html>
+
+
